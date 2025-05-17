@@ -94,7 +94,7 @@ namespace Whisper.Samples
         {
             commandDictionary = new Dictionary<string, (Action function, string message)>
             {
-                { "open sweer", ( () => desktopManager.OpenApp(0), "Opening sweet") },
+                { "open sweet", ( () => desktopManager.OpenApp(0), "Opening sweet") },
                 // { "open file manager", ( () => desktopManager.OpenApp(1), "Opening File Manager") },
                 { "open sugar", ( () => desktopManager.OpenApp(2), "Opening Sugar") },
                 { "close application", ( () => desktopManager.CloseCurrentApp(), "Closing app") },
