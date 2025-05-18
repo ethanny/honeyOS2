@@ -30,6 +30,7 @@ namespace Whisper.Samples
         public PageController help;
         public ProcessManager processManager;
         public PageController2 scheduler;
+        public AlgorithmManager algorithmManager;
 
         [Header("UI")]
         public Button button;
@@ -122,6 +123,15 @@ namespace Whisper.Samples
                 { "choose round robin", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("RR");}, "Round Robin Simulator") },
                 { "choose shortest job first", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("SJF");}, "Shortest Job First Simulator") },
                 { "play simulation", ( () => processManager.Play(), "Starting simulation") },
+                
+                // Page Replacement Algorithm commands
+                { "start page replacement", ( () => scheduler.OpenSelectionPage(), "Opening Algorithm selector") },
+                { "back to algorithm selection", ( () => {scheduler.OpenSelectionPage();}, "Opening Algorithm selector") },
+                { "choose fifo", ( () => {scheduler.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "FIFO Algorithm") },
+                { "choose lru", ( () => {scheduler.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "LRU Algorithm") },
+                { "choose optimal", ( () => {scheduler.OpenSimPage(); algorithmManager.SetAlgorithm("OPT");}, "Optimal Algorithm") },
+                { "choose clock", ( () => {scheduler.OpenSimPage(); algorithmManager.SetAlgorithm("CLOCK");}, "Clock Algorithm") },
+                
                 { "pause", ( () => processManager.Pause(), "Pausing simulation") },
                 { "add process", ( () => processManager.AddProcess(false), "Adding Process") },
                 { "stop simulation", ( () => processManager.Stop(), "Stoping simulation") },
