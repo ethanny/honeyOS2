@@ -12,6 +12,8 @@ public class AlgorithmManager : MonoBehaviour
     public TMP_InputField referenceStringInput;
     public Slider frameCountSlider;
     public TMP_Text frameCountText;
+    public TMP_Text pageFaultCountText;
+    public TMP_Text hitRateText;
     
     private List<int> referenceString = new List<int>();
     private int frameCount = 3; // Default frame count
@@ -273,5 +275,122 @@ public class AlgorithmManager : MonoBehaviour
         }
         
         Debug.Log("Page replacement simulator reset");
+    }
+    
+    // FIFO Simulation
+    public void RunFIFOSimulation()
+    {
+        if (referenceString.Count == 0)
+        {
+            Debug.LogWarning("No reference string to simulate");
+            return;
+        }
+        
+        // Initialize counters
+        int pageFaults = 0;
+        int hits = 0;
+        
+        // FIFO page replacement data structures
+        HashSet<int> pageSet = new HashSet<int>();
+        Queue<int> pageQueue = new Queue<int>();
+        
+        // Memory state representation for visualization
+        int[] frames = new int[frameCount];
+        for (int i = 0; i < frameCount; i++)
+        {
+            frames[i] = -1; // -1 means empty frame
+        }
+        
+        // Process each page in the reference string
+        for (int i = 0; i < referenceString.Count; i++)
+        {
+            int currentPage = referenceString[i];
+            
+            // Don't highlight reference boxes
+            // HighlightReferenceBox(i);
+            
+            // Check if page is already in memory (hit)
+            if (pageSet.Contains(currentPage))
+            {
+                // Page Hit
+                hits++;
+                
+                // Update indicator cell
+                UpdateSimulationCell(frameCount, i, "H", pageHitColor);
+                
+                // No change in frames, just copy previous column state
+                if (i > 0)
+                {
+                    for (int f = 0; f < frameCount; f++)
+                    {
+                        // Copy the previous column's value
+                        UpdateSimulationCell(f, i, 
+                            frames[f] == -1 ? "" : frames[f].ToString(), 
+                            frames[f] == currentPage ? accessedColor : defaultColor);
+                    }
+                }
+            }
+            else
+            {
+                // Page Fault
+                pageFaults++;
+                
+                // Update indicator cell
+                UpdateSimulationCell(frameCount, i, "F", pageFaultColor);
+                
+                if (pageSet.Count < frameCount)
+                {
+                    // Memory not full, add page to an empty frame
+                    for (int f = 0; f < frameCount; f++)
+                    {
+                        if (frames[f] == -1)
+                        {
+                            frames[f] = currentPage;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // Memory full, replace oldest page (FIFO)
+                    int oldestPage = pageQueue.Dequeue();
+                    pageSet.Remove(oldestPage);
+                    
+                    // Find and replace the oldest page in frames
+                    for (int f = 0; f < frameCount; f++)
+                    {
+                        if (frames[f] == oldestPage)
+                        {
+                            frames[f] = currentPage;
+                            break;
+                        }
+                    }
+                }
+                
+                // Add new page to set and queue
+                pageSet.Add(currentPage);
+                pageQueue.Enqueue(currentPage);
+                
+                // Update frame visualization
+                for (int f = 0; f < frameCount; f++)
+                {
+                    UpdateSimulationCell(f, i, 
+                        frames[f] == -1 ? "" : frames[f].ToString(), 
+                        frames[f] == currentPage ? accessedColor : defaultColor);
+                }
+            }
+        }
+        
+        // Display statistics
+        if (pageFaultCountText != null)
+        {
+            pageFaultCountText.text = "Page Faults: " + pageFaults;
+        }
+        
+        if (hitRateText != null)
+        {
+            float hitRate = (float)hits / referenceString.Count * 100f;
+            hitRateText.text = "Hit Rate: " + hitRate.ToString("F2") + "%";
+        }
     }
 } 
