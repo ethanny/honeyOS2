@@ -90,44 +90,45 @@ namespace Whisper.Samples
         }
 
         // Function to initialize the command dictionary
-        private void InitCommandDictionary()
-        {
-            commandDictionary = new Dictionary<string, (Action function, string message)>
-            {
-                { "open sweer", ( () => desktopManager.OpenApp(0), "Opening sweet") },
-                // { "open file manager", ( () => desktopManager.OpenApp(1), "Opening File Manager") },
-                { "open sugar", ( () => desktopManager.OpenApp(2), "Opening Sugar") },
-                { "close application", ( () => desktopManager.CloseCurrentApp(), "Closing app") },
-                { "close all", ( () => desktopManager.CloseAllApps(), "Closing all app") },
-                { "minimize application", ( () => desktopManager.MinCurrentApp() ,"Minimizing app") },
-                { "save file", ( () => textEditor.Save(), "Saving File") },
-                { "save as file", ( () => textEditor.SaveAs(), "Saving File") },
-                { "open file", ( () => textEditor.OpenFile(), "Opening File") },
-                { "new file", ( () => textEditor.NewFile(), "Creating New File") },
-                { "undo", ( () => textEditor.Undo(), "Undo text changes") },
-                { "redo", ( () => textEditor.Redo(), "Redo text changes") },
-                { "copy", ( () => textEditor.Copy(), "Copying selected text") },
-                { "cut", ( () => textEditor.Cut(), "Cutting selected text") },
-                { "paste", ( () => textEditor.Paste(), "Pasting text from clipboard") },
-                { "go back", ( () => help.OpenHome(), "Going back to Home Page") },
-                { "open system basics", ( () => help.OpenSystemBasics(), "Opening System Basics") },
-                { "open application guide", ( () => help.OpenAppGuide(), "Opening Application Guide") },
-                { "open about us", ( () => help.OpenAboutUs(), "Opening About Us") },
-                // Add more commands and their corresponding functions and messages as needed
-                { "open cake", ( () => desktopManager.OpenApp(1), "Opening Cake") },
-                { "start cake", ( () => scheduler.OpenSelectionPage(), "Opening Policy selector") },
-                { "back to policy selection", ( () => {scheduler.OpenSelectionPage(); processManager.Stop();}, "Opening Policy selector") },
-                { "choose first come first serve", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("FCFS");}, "FCFS Simulator") },
-                { "choose priority", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("Prio");}, "Priority Simulator") },
-                { "choose round robin", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("RR");}, "Round Robin Simulator") },
-                { "choose shortest job first", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("SJF");}, "Shortest Job First Simulator") },
-                { "play simulation", ( () => processManager.Play(), "Starting simulation") },
-                { "pause", ( () => processManager.Pause(), "Pausing simulation") },
-                { "add process", ( () => processManager.AddProcess(false), "Adding Process") },
-                { "stop simulation", ( () => processManager.Stop(), "Stoping simulation") },
-                { "next", ( () => processManager.Next(), "Next") },
-            };
-        }
+private void InitCommandDictionary()
+{
+    commandDictionary = new Dictionary<string, (Action, string)>();
+
+    commandDictionary.Add("open sweet", new ValueTuple<Action, string>(() => desktopManager.OpenApp(0), "Opening sweet"));
+    commandDictionary.Add("open sugar", new ValueTuple<Action, string>(() => desktopManager.OpenApp(2), "Opening Sugar"));
+    commandDictionary.Add("close application", new ValueTuple<Action, string>(() => desktopManager.CloseApp(0), "Closing app")); // Modify as needed
+    commandDictionary.Add("close all", new ValueTuple<Action, string>(() => desktopManager.CloseAllApps(), "Closing all app"));
+    commandDictionary.Add("minimize application", new ValueTuple<Action, string>(() => desktopManager.MinimizeApp(0), "Minimizing app")); // Modify as needed
+
+    commandDictionary.Add("save file", new ValueTuple<Action, string>(() => textEditor.Save(), "Saving File"));
+    commandDictionary.Add("save as file", new ValueTuple<Action, string>(() => textEditor.SaveAs(), "Saving File"));
+    commandDictionary.Add("open file", new ValueTuple<Action, string>(() => textEditor.OpenFile(), "Opening File"));
+    commandDictionary.Add("new file", new ValueTuple<Action, string>(() => textEditor.NewFile(), "Creating New File"));
+    commandDictionary.Add("undo", new ValueTuple<Action, string>(() => textEditor.Undo(), "Undo text changes"));
+    commandDictionary.Add("redo", new ValueTuple<Action, string>(() => textEditor.Redo(), "Redo text changes"));
+    commandDictionary.Add("copy", new ValueTuple<Action, string>(() => textEditor.Copy(), "Copying selected text"));
+    commandDictionary.Add("cut", new ValueTuple<Action, string>(() => textEditor.Cut(), "Cutting selected text"));
+    commandDictionary.Add("paste", new ValueTuple<Action, string>(() => textEditor.Paste(), "Pasting text from clipboard"));
+
+    commandDictionary.Add("go back", new ValueTuple<Action, string>(() => help.OpenHome(), "Going back to Home Page"));
+    commandDictionary.Add("open system basics", new ValueTuple<Action, string>(() => help.OpenSystemBasics(), "Opening System Basics"));
+    commandDictionary.Add("open application guide", new ValueTuple<Action, string>(() => help.OpenAppGuide(), "Opening Application Guide"));
+    commandDictionary.Add("open about us", new ValueTuple<Action, string>(() => help.OpenAboutUs(), "Opening About Us"));
+
+    commandDictionary.Add("open cake", new ValueTuple<Action, string>(() => desktopManager.OpenApp(1), "Opening Cake"));
+    commandDictionary.Add("start cake", new ValueTuple<Action, string>(() => scheduler.OpenSelectionPage(), "Opening Policy selector"));
+    commandDictionary.Add("back to policy selection", new ValueTuple<Action, string>(() => { scheduler.OpenSelectionPage(); processManager.Stop(); }, "Opening Policy selector"));
+    commandDictionary.Add("choose first come first serve", new ValueTuple<Action, string>(() => { scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("FCFS"); }, "FCFS Simulator"));
+    commandDictionary.Add("choose priority", new ValueTuple<Action, string>(() => { scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("Prio"); }, "Priority Simulator"));
+    commandDictionary.Add("choose round robin", new ValueTuple<Action, string>(() => { scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("RR"); }, "Round Robin Simulator"));
+    commandDictionary.Add("choose shortest job first", new ValueTuple<Action, string>(() => { scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("SJF"); }, "Shortest Job First Simulator"));
+
+    commandDictionary.Add("play simulation", new ValueTuple<Action, string>(() => processManager.Play(), "Starting simulation"));
+    commandDictionary.Add("pause", new ValueTuple<Action, string>(() => processManager.Pause(), "Pausing simulation"));
+    commandDictionary.Add("add process", new ValueTuple<Action, string>(() => processManager.AddProcess(false), "Adding Process"));
+    commandDictionary.Add("stop simulation", new ValueTuple<Action, string>(() => processManager.Stop(), "Stopping simulation"));
+    commandDictionary.Add("next", new ValueTuple<Action, string>(() => processManager.Next(), "Next"));
+}
 
         private void Update()
         {

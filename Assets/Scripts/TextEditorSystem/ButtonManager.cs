@@ -7,51 +7,51 @@ using UnityEngine.UI;
 
 public class ButtonManager : MonoBehaviour
 {
-    [SerializeField] Button saveButton;
-    [SerializeField] Button saveAsButton;
-    [SerializeField] Button openFileButton;
-    [SerializeField] Button newFileButton;
+    [SerializeField] private Button saveButton;
+    [SerializeField] private Button saveAsButton;
+    [SerializeField] private Button openFileButton;
+    [SerializeField] private Button newFileButton;
 
-    [SerializeField] Button undoButton;
-    [SerializeField] Button redoButton;
+    [SerializeField] private Button undoButton;
+    [SerializeField] private Button redoButton;
 
-    [SerializeField] Button copyButton;
-    [SerializeField] Button cutButton;
-    [SerializeField] Button pasteButton; 
+    [SerializeField] private Button copyButton;
+    [SerializeField] private Button cutButton;
+    [SerializeField] private Button pasteButton; 
 
-    public static ButtonManager Instance { get; private set;}
+    [SerializeField] private Button closeButton;
+    [SerializeField] private Button minimizeButton;
 
-    private void Awake()
+    [SerializeField] private App appToControl; // <-- Assigned in Inspector
+
+    private void Start()
     {
-        Instance = this;
+        if (closeButton != null && appToControl != null)
+            closeButton.onClick.AddListener(appToControl.OnCloseButtonPressed);
+
+        if (minimizeButton != null && appToControl != null)
+            minimizeButton.onClick.AddListener(appToControl.OnMinimizeButtonPressed);
+
+        if (closeButton != null && appToControl != null)
+    {
+        closeButton.onClick.RemoveAllListeners(); // Just to be safe
+        closeButton.onClick.AddListener(appToControl.OnCloseButtonPressed);
     }
 
-    public Button SaveButton {
-        get => saveButton;
+    if (minimizeButton != null && appToControl != null)
+    {
+        minimizeButton.onClick.RemoveAllListeners();
+        minimizeButton.onClick.AddListener(appToControl.OnMinimizeButtonPressed);
     }
-    public Button SaveAsButton {
-        get => saveAsButton;
-    }
-    public Button OpenFileButton {
-        get => openFileButton;
-    }
-    public Button NewFileButton {
-        get => newFileButton;
     }
 
-    public Button UndoButton {
-        get => undoButton;
-    }
-    public Button RedoButton {
-        get => redoButton;
-    }
-    public Button CopyButton {
-        get => copyButton;
-    }
-    public Button CutButton {
-        get => copyButton;
-    }
-    public Button PasteButton {
-        get => copyButton;
-    }
+    public Button SaveButton => saveButton;
+    public Button SaveAsButton => saveAsButton;
+    public Button OpenFileButton => openFileButton;
+    public Button NewFileButton => newFileButton;
+    public Button UndoButton => undoButton;
+    public Button RedoButton => redoButton;
+    public Button CopyButton => copyButton;
+    public Button CutButton => cutButton;
+    public Button PasteButton => pasteButton;
 }

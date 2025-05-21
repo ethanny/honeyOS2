@@ -1,59 +1,61 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 // Define the base class for all apps
-public class App : MonoBehaviour
-{   
+public class App : MonoBehaviour, IPointerDownHandler
+{
     public AppIcon appIcon; // Reference to the associated app icon
     private Animator animator;
 
     private void Start()
     {
-        // Get the Animator component attached to this GameObject
         animator = GetComponent<Animator>();
+        gameObject.SetActive(false); // Ensure it starts closed
     }
 
     public virtual void Open()
-    {   
-        // gameObject.SetActive(true);
-        animator.Play("Open");
+    {
+        gameObject.SetActive(true);
+        BringToFront();
+
+        if (animator != null)
+            animator.Play("Open");
+
         UpdateIcon(AppState.Opened);
     }
 
     public virtual void Close()
-    {   
-        animator.Play("Close");
-        // gameObject.SetActive(false);
+    {
+        if (animator != null)
+            animator.Play("Close");
+
         UpdateIcon(AppState.Closed);
         Reset();
+        gameObject.SetActive(false); // ✅ Actually hides the app
     }
 
     public virtual void Minimize()
-    {   
-        animator.Play("Close");
+    {
+        if (animator != null)
+            animator.Play("Close");
 
-        // Update the app icon state
         UpdateIcon(AppState.Minimized);
-
-        // Start a coroutine to delay deactivation
-        // StartCoroutine(DeactivateAfterAnimation());
+        gameObject.SetActive(false); // ✅ Actually hides the app
     }
 
-    // Coroutine to deactivate the GameObject after minimize animation finishes
-    // private IEnumerator DeactivateAfterAnimation()
-    // {
-    //     // Wait until the current animation completes
-    //     yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
-    //     // Deactivate the GameObject
-    //     // gameObject.SetActive(false);
-       
-    // }
-    
-    // Method to reset the app to its default state
-    protected virtual void Reset() {}
+    public void BringToFront()
+    {
+        transform.SetAsLastSibling(); // Moves this app to the top of the UI stack
+    }
 
-    // Method to update the app icon indicator
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        BringToFront(); // Brings app forward when clicked
+    }
+
+    protected virtual void Reset() { }
+
     private void UpdateIcon(AppState state)
     {
         if (appIcon != null)
@@ -62,4 +64,13 @@ public class App : MonoBehaviour
         }
     }
 
+    public void OnCloseButtonPressed()
+{
+    Close(); // Calls this app's Close() method
+}
+
+public void OnMinimizeButtonPressed()
+{
+    Minimize(); // Calls this app's Minimize() method
+}
 }

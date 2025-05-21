@@ -1,82 +1,49 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Define the DesktopManager class to control opening and closing of apps
-// Define the DesktopManager class to control opening and closing of apps
 public class DesktopManager : MonoBehaviour
 {
-    public List<App> apps; // List to store references to app scripts
-
-    public App currentAppInstance; // Reference to the currently opened app instance
-
+    public List<App> apps; // List of app scripts (Sweet, Cake, Sugar)
     public static DesktopManager Instance { get; private set; }
 
-    private void Start()
+    private void Awake()
     {
         Instance = this;
-        // // Close all apps when DesktopManager starts
-        // CloseAllApps();
-    }
-
-    public void CloseAllApps()
-    {
-        // Iterate through all app prefabs and close them
-        foreach (App appPrefab in apps)
-        {
-            appPrefab.Close();
-            
-        }
     }
 
     public void OpenApp(int index)
     {
-        // Ensure index is within range
         if (index >= 0 && index < apps.Count)
         {
-            App appScript = apps[index];
-
-            if (appScript == currentAppInstance)
-            {
-                // Do nothing if the app is already open
-                return;
-            }
-
-            if (currentAppInstance != null)
-            {   
-                // Minimize currently opened app that is not the opened one
-                MinCurrentApp();
-            }
-
-            currentAppInstance = appScript;
-            currentAppInstance.Open();
+            apps[index].Open(); // ✅ Just open the app — no hiding others
         }
-        
         else
         {
             Debug.LogError("Index out of range.");
         }
     }
 
-    public void CloseCurrentApp()
+    public void CloseApp(int index)
     {
-        if (currentAppInstance != null)
+        if (index >= 0 && index < apps.Count)
         {
-            currentAppInstance.Close();
-            currentAppInstance = null;
+            apps[index].Close();
         }
     }
 
-    public void MinCurrentApp()
+    public void MinimizeApp(int index)
     {
-        if (currentAppInstance != null)
+        if (index >= 0 && index < apps.Count)
         {
-            currentAppInstance.Minimize();
-            currentAppInstance = null;
+            apps[index].Minimize();
         }
     }
 
-    public App CurrentAppInstance {
-        get => currentAppInstance;
-        set => currentAppInstance = value;
+    public void CloseAllApps()
+    {
+        foreach (App app in apps)
+        {
+            app.Close();
+        }
     }
 }
