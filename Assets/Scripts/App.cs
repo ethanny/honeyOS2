@@ -16,6 +16,12 @@ public class App : MonoBehaviour
 
     public virtual void Open()
     {   
+        if (animator == null)
+        {
+            Debug.LogError($"Animator is null on {gameObject.name}! Animation will not play.");
+            return;
+        }
+        
         // gameObject.SetActive(true);
         animator.Play("Open");
         UpdateIcon(AppState.Opened);
@@ -23,6 +29,12 @@ public class App : MonoBehaviour
 
     public virtual void Close()
     {   
+        if (animator == null)
+        {
+            Debug.LogError($"Animator is null on {gameObject.name}! Animation will not play.");
+            return;
+        }
+        
         animator.Play("Close");
         // gameObject.SetActive(false);
         UpdateIcon(AppState.Closed);
@@ -31,6 +43,12 @@ public class App : MonoBehaviour
 
     public virtual void Minimize()
     {   
+        if (animator == null)
+        {
+            Debug.LogError($"Animator is null on {gameObject.name}! Animation will not play.");
+            return;
+        }
+        
         animator.Play("Close");
 
         // Update the app icon state

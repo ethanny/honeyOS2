@@ -53,7 +53,7 @@ public class DesktopManager : MonoBehaviour
         
         else
         {
-            Debug.LogError("Index out of range.");
+            Debug.LogError($"Index {index} out of range. Available apps: {apps.Count}");
         }
     }
 
