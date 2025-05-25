@@ -97,7 +97,7 @@ namespace Whisper.Samples
             {
                 { "open sweet", ( () => desktopManager.OpenApp(0), "Opening sweet") },
                 // { "open file manager", ( () => desktopManager.OpenApp(1), "Opening File Manager") },
-                { "open sugar", ( () => desktopManager.OpenApp(2), "Opening Sugar") },
+                { "open sugar", ( () => desktopManager.OpenApp(3), "Opening Sugar") },
                 { "close application", ( () => desktopManager.CloseCurrentApp(), "Closing app") },
                 { "close all", ( () => desktopManager.CloseAllApps(), "Closing all app") },
                 { "minimize application", ( () => desktopManager.MinCurrentApp() ,"Minimizing app") },
@@ -125,12 +125,7 @@ namespace Whisper.Samples
                 { "play simulation", ( () => processManager.Play(), "Starting simulation") },
                 
                 // Page Replacement Algorithm commands
-                { "start page replacement", ( () => scheduler.OpenSelectionPage(), "Opening Algorithm selector") },
-                { "back to algorithm selection", ( () => {scheduler.OpenSelectionPage();}, "Opening Algorithm selector") },
-                { "choose fifo", ( () => {scheduler.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "FIFO Algorithm") },
-                { "choose lru", ( () => {scheduler.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "LRU Algorithm") },
-                { "choose optimal", ( () => {scheduler.OpenSimPage(); algorithmManager.SetAlgorithm("OPT");}, "Optimal Algorithm") },
-                { "choose clock", ( () => {scheduler.OpenSimPage(); algorithmManager.SetAlgorithm("CLOCK");}, "Clock Algorithm") },
+                { "open blueberry", ( () => desktopManager.OpenApp(2), "Opening Blueberry") },
                 
                 { "pause", ( () => processManager.Pause(), "Pausing simulation") },
                 { "add process", ( () => processManager.AddProcess(false), "Adding Process") },
