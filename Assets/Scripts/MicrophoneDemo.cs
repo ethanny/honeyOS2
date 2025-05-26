@@ -97,17 +97,20 @@ namespace HoneyOS.VoiceControl
                 
                 // Build the full path to the context file
                 string fullContextPath;
+                string platform = GetPlatform();
                 
                 #if UNITY_EDITOR
-                    fullContextPath = System.IO.Path.Combine(Application.streamingAssetsPath, contextPath);
+                    fullContextPath = System.IO.Path.Combine(Application.streamingAssetsPath, $"contexts/{platform}/{GetContextFileName()}");
                 #elif UNITY_ANDROID
                     fullContextPath = contextPath; // On Android, use relative path
                 #else
-                    fullContextPath = System.IO.Path.Combine(Application.streamingAssetsPath, contextPath);
+                    fullContextPath = System.IO.Path.Combine(Application.streamingAssetsPath, $"contexts/{platform}/{GetContextFileName()}");
                 #endif
                 
+                UnityEngine.Debug.Log($"Initializing Rhino - Platform: {platform}");
                 UnityEngine.Debug.Log($"Initializing Rhino - Context path: {fullContextPath}");
                 UnityEngine.Debug.Log($"Access key length: {accessKey.Length}");
+                UnityEngine.Debug.Log($"Unity Platform: {Application.platform}");
                 
                 if (accessKey == "YOUR_ACCESS_KEY_HERE")
                 {
@@ -116,12 +119,23 @@ namespace HoneyOS.VoiceControl
                     return;
                 }
                 
-                // Verify context file exists
+                // Verify context file exists, with fallback to main context file
                 if (!System.IO.File.Exists(fullContextPath))
                 {
-                    UnityEngine.Debug.LogError($"Context file not found at: {fullContextPath}");
-                    DisplayOutputText("Context file not found");
-                    return;
+                    UnityEngine.Debug.LogWarning($"Platform-specific context file not found at: {fullContextPath}");
+                    // Fallback to main context file
+                    fullContextPath = System.IO.Path.Combine(Application.streamingAssetsPath, contextPath);
+                    
+                    if (!System.IO.File.Exists(fullContextPath))
+                    {
+                        UnityEngine.Debug.LogError($"Context file not found at: {fullContextPath}");
+                        DisplayOutputText("Context file not found");
+                        return;
+                    }
+                    else
+                    {
+                        UnityEngine.Debug.Log($"Using fallback context file: {fullContextPath}");
+                    }
                 }
                 
                 rhinoManager = RhinoManager.Create(
@@ -146,8 +160,9 @@ namespace HoneyOS.VoiceControl
                 // App Management - using original command phrases as fallback
                 { "openSweet", ( () => desktopManager.OpenApp(0), "Opening Sweet") },
                 { "open sweet", ( () => desktopManager.OpenApp(0), "Opening Sweet") },
-                { "openSugar", ( () => desktopManager.OpenApp(2), "Opening Sugar") },
-                { "open sugar", ( () => desktopManager.OpenApp(2), "Opening Sugar") },
+                { "openSugar", ( () => desktopManager.OpenApp(3), "Opening Sugar") },
+                { "open sugar", ( () => desktopManager.OpenApp(3), "Opening Sugar") },
+                { "open blueberry", ( () => desktopManager.OpenApp(2), "Opening Sugar") },
                 { "openCake", ( () => desktopManager.OpenApp(1), "Opening Cake") },
                 { "open cake", ( () => desktopManager.OpenApp(1), "Opening Cake") },
                 { "closeApp", ( () => desktopManager.CloseCurrentApp(), "Closing app") },
@@ -533,6 +548,34 @@ namespace HoneyOS.VoiceControl
             {
                 StopListening();
             }
+        }
+
+        private string GetPlatform()
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.WindowsPlayer:
+                    return "windows";
+                case RuntimePlatform.OSXEditor:
+                case RuntimePlatform.OSXPlayer:
+                    return "mac";
+                case RuntimePlatform.LinuxEditor:
+                case RuntimePlatform.LinuxPlayer:
+                    return "linux";
+                case RuntimePlatform.IPhonePlayer:
+                    return "ios";
+                case RuntimePlatform.Android:
+                    return "android";
+                default:
+                    throw new NotSupportedException($"Platform '{Application.platform}' not supported by Rhino Unity binding");
+            }
+        }
+
+        private string GetContextFileName()
+        {
+            string platform = GetPlatform();
+            return $"honeyos_context_{platform}.rhn";
         }
 
         private void OnDestroy()
