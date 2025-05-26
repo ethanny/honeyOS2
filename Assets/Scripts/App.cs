@@ -1,3 +1,5 @@
+
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,11 +9,20 @@ public class App : MonoBehaviour
 {   
     public AppIcon appIcon; // Reference to the associated app icon
     private Animator animator;
+    protected WindowMaximizer windowMaximizer; // Reference to the window maximizer component
+    private bool wasMaximizedBeforeMinimize = false; // Store window state before minimizing
 
     private void Start()
     {
         // Get the Animator component attached to this GameObject
         animator = GetComponent<Animator>();
+        
+        // Get the WindowMaximizer component
+        windowMaximizer = GetComponent<WindowMaximizer>();
+        if (windowMaximizer == null)
+        {
+            Debug.LogWarning($"WindowMaximizer component not found on {gameObject.name}. Window maximizing will not be available.");
+        }
     }
 
     public virtual void Open()
@@ -25,6 +36,21 @@ public class App : MonoBehaviour
         // gameObject.SetActive(true);
         animator.Play("Open");
         UpdateIcon(AppState.Opened);
+
+        // When opening from a closed state, always start in normal mode
+        if (windowMaximizer != null)
+        {
+            // Only restore maximized state if the app was minimized
+            if (appIcon.IsMinimized())
+            {
+                windowMaximizer.SetWindowState(wasMaximizedBeforeMinimize);
+            }
+            else
+            {
+                // Opening from closed state - start in normal mode
+                windowMaximizer.SetWindowState(false);
+            }
+        }
     }
 
     public virtual void Close()
@@ -33,6 +59,13 @@ public class App : MonoBehaviour
         {
             Debug.LogError($"Animator is null on {gameObject.name}! Animation will not play.");
             return;
+        }
+        
+        // Reset window state and clear stored state
+        if (windowMaximizer != null)
+        {
+            wasMaximizedBeforeMinimize = false;
+            windowMaximizer.SetWindowState(false); // Always restore to normal size when closing
         }
         
         animator.Play("Close");
@@ -49,27 +82,29 @@ public class App : MonoBehaviour
             return;
         }
         
+        // Store window state before minimizing
+        if (windowMaximizer != null)
+        {
+            wasMaximizedBeforeMinimize = windowMaximizer.IsMaximized;
+            windowMaximizer.SetWindowState(false); // Always restore to normal size when minimizing
+        }
+        
         animator.Play("Close");
 
         // Update the app icon state
         UpdateIcon(AppState.Minimized);
-
-        // Start a coroutine to delay deactivation
-        // StartCoroutine(DeactivateAfterAnimation());
     }
-
-    // Coroutine to deactivate the GameObject after minimize animation finishes
-    // private IEnumerator DeactivateAfterAnimation()
-    // {
-    //     // Wait until the current animation completes
-    //     yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
-    //     // Deactivate the GameObject
-    //     // gameObject.SetActive(false);
-       
-    // }
     
     // Method to reset the app to its default state
-    protected virtual void Reset() {}
+    protected virtual void Reset() 
+    {
+        // Reset window state
+        wasMaximizedBeforeMinimize = false;
+        if (windowMaximizer != null)
+        {
+            windowMaximizer.SetWindowState(false);
+        }
+    }
 
     // Method to update the app icon indicator
     private void UpdateIcon(AppState state)
@@ -79,5 +114,7 @@ public class App : MonoBehaviour
             appIcon.UpdateIndicator(state);
         }
     }
-
 }
+
+
+

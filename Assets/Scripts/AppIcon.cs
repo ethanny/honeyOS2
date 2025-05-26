@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class AppIcon : MonoBehaviour
 {
     public Image indicator; // Reference to the indicator image
+    private AppState currentState = AppState.Closed;
 
     private void Start()
     {
@@ -11,10 +12,10 @@ public class AppIcon : MonoBehaviour
         UpdateIndicator(AppState.Closed);
     }
 
-
     // Method to update the indicator based on the app's state
     public void UpdateIndicator(AppState state)
     {
+        currentState = state;
         switch (state)
         {
             case AppState.Opened:
@@ -54,17 +55,26 @@ public class AppIcon : MonoBehaviour
         }
     }
 
-     // Call this method to set the color of the indicator using a hexadecimal string
+    // Call this method to set the color of the indicator using a hexadecimal string
     public void SetIndicatorColorFromHex(string hex)
     {
-        Color color;
-        if (ColorUtility.TryParseHtmlString(hex, out color))
+        if (indicator != null)
         {
-            indicator.color = color;
+            Color newColor;
+            if (ColorUtility.TryParseHtmlString(hex, out newColor))
+            {
+                indicator.color = newColor;
+            }
+            else
+            {
+                Debug.LogWarning($"Failed to parse color hex code: {hex}");
+            }
         }
-        else
-        {
-            Debug.LogError("Invalid hexadecimal color format: " + hex);
-        }
+    }
+
+    // Check if the app is currently minimized
+    public bool IsMinimized()
+    {
+        return currentState == AppState.Minimized;
     }
 }
