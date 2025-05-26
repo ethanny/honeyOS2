@@ -16,6 +16,11 @@ public class AlgorithmManager : MonoBehaviour
     public TMP_Text pageFaultCountText;
     public TMP_Text hitCountText;
     public TMP_Text hitRateText;
+    public Button playButton;
+    public Button pauseButton;
+    public Button resumeButton;
+    private bool isSimulationRunning = false;
+    private bool isPaused = false;
     
     private List<int> referenceString = new List<int>();
     private int frameCount = 3; // Default frame count
@@ -55,6 +60,16 @@ public class AlgorithmManager : MonoBehaviour
         
         // Set default algorithm
         selectedAlgorithm = "FIFO";
+
+        // Initialize button states
+        if (pauseButton != null)
+        {
+            pauseButton.gameObject.SetActive(false);
+        }
+        if (resumeButton != null)
+        {
+            resumeButton.gameObject.SetActive(false);
+        }
     }
     
     public void UpdateFrameCount(float value)
@@ -88,6 +103,9 @@ public class AlgorithmManager : MonoBehaviour
                 break;
             case "MRU":
                 algorithmTitleText.text = "Most Recently Used";
+                break;
+            case "LFU":
+                algorithmTitleText.text = "Least Frequently Used";
                 break;
             default:
                 algorithmTitleText.text = "Page Algorithm";
@@ -299,6 +317,17 @@ public class AlgorithmManager : MonoBehaviour
     
     public void Reset()
     {
+        // Stop any running simulation
+        if (isSimulationRunning)
+        {
+            StopAllCoroutines();
+            isSimulationRunning = false;
+            isPaused = false;
+            playButton.gameObject.SetActive(true);
+            pauseButton.gameObject.SetActive(false);
+            resumeButton.gameObject.SetActive(false);
+        }
+        
         // Clear reference string
         referenceString.Clear();
         
@@ -333,19 +362,32 @@ public class AlgorithmManager : MonoBehaviour
         Debug.Log("Page replacement simulator reset");
     }
     
-    // Run the currently selected algorithm
+    // Toggle pause/resume
+    public void TogglePause()
+    {
+        isPaused = !isPaused;
+        
+        // Update button visibility
+        if (pauseButton != null)
+        {
+            pauseButton.gameObject.SetActive(!isPaused);
+        }
+        if (resumeButton != null)
+        {
+            resumeButton.gameObject.SetActive(isPaused);
+        }
+    }
+
     public void RunSelectedAlgorithm()
     {
+        ClearSimulationResults();
+        
         if (referenceString.Count == 0)
         {
-            Debug.LogWarning("No reference string to simulate");
+            Debug.LogWarning("Reference string is empty!");
             return;
         }
         
-        // Clear previous simulation results
-        ClearSimulationResults();
-        
-        // Create and run the appropriate algorithm
         PageReplacementAlgorithm algorithm = null;
         
         switch (selectedAlgorithm)
@@ -362,14 +404,43 @@ public class AlgorithmManager : MonoBehaviour
             case "MRU":
                 algorithm = new MRUAlgorithm(referenceString, frameCount, this);
                 break;
-            default:
-                algorithm = new FIFOAlgorithm(referenceString, frameCount, this);
+            case "LFU":
+                algorithm = new LFUAlgorithm(referenceString, frameCount, this);
                 break;
+            default:
+                Debug.LogError("Unknown algorithm selected!");
+                return;
         }
         
         if (algorithm != null)
         {
-            StartCoroutine(algorithm.RunSimulation());
+            isSimulationRunning = true;
+            isPaused = false;
+            playButton.gameObject.SetActive(false);
+            pauseButton.gameObject.SetActive(true);
+            resumeButton.gameObject.SetActive(false);
+            StartCoroutine(RunSimulationWithCallback(algorithm));
+        }
+    }
+
+    private IEnumerator RunSimulationWithCallback(PageReplacementAlgorithm algorithm)
+    {
+        yield return StartCoroutine(algorithm.RunSimulation());
+        
+        // Simulation complete
+        isSimulationRunning = false;
+        isPaused = false;
+        playButton.gameObject.SetActive(true);
+        pauseButton.gameObject.SetActive(false);
+        resumeButton.gameObject.SetActive(false);
+    }
+
+    // Add method to check if simulation should wait
+    public IEnumerator WaitIfPaused()
+    {
+        while (isPaused)
+        {
+            yield return null;
         }
     }
 } 

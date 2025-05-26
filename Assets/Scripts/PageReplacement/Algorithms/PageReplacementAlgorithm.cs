@@ -41,4 +41,17 @@ public abstract class PageReplacementAlgorithm
             manager.hitRateText.text = "Hit Rate: " + hitRate.ToString("F2") + "%";
         }
     }
+
+    // Helper method to wait between steps with pause support
+    protected IEnumerator WaitForNextStep()
+    {
+        // First check if we're paused
+        yield return manager.WaitIfPaused();
+        
+        // Then wait for the step delay
+        yield return new WaitForSeconds(1f);
+        
+        // Check for pause again after the delay
+        yield return manager.WaitIfPaused();
+    }
 } 

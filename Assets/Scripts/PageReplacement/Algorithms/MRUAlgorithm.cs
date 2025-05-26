@@ -130,8 +130,8 @@ public class MRUAlgorithm : PageReplacementAlgorithm
             // Update statistics
             UpdateStatistics(pageFaults, hits, i);
             
-            // Wait for 1 second before the next step
-            yield return new WaitForSeconds(1f);
+            // Wait for next step with pause support
+            yield return WaitForNextStep();
         }
     }
 } 
