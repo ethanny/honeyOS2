@@ -119,15 +119,31 @@ public class AlgorithmManager : MonoBehaviour
     {
         referenceString.Clear();
         
-        string input = referenceStringInput.text;
+        string input = referenceStringInput.text.Trim();
+        if (string.IsNullOrEmpty(input))
+        {
+            PageReplacementPopUpManager.Instance.ShowPopUp("InvalidPageReference");
+            return;
+        }
+
         string[] values = input.Split(' ');
-        
+        bool isValid = true;
+
         foreach (string value in values)
         {
-            if (int.TryParse(value, out int pageNumber))
+            if (!int.TryParse(value, out int pageNumber) || pageNumber < 0 || pageNumber > 9)
             {
-                referenceString.Add(pageNumber);
+                isValid = false;
+                break;
             }
+            referenceString.Add(pageNumber);
+        }
+
+        if (!isValid)
+        {
+            referenceString.Clear();
+            PageReplacementPopUpManager.Instance.ShowPopUp("InvalidPageReference");
+            return;
         }
         
         Debug.Log("Reference string processed: " + string.Join(", ", referenceString));
