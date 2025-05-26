@@ -357,54 +357,55 @@ public class TextEditorController : MonoBehaviour
         TextField.caretPosition = caretPosition + clipboardText.Length;
     }
 
-    public void BoldSelectedText()
+    public void ToggleBold()
+{
+    // Check if there is any text selected
+    if (TextField.selectionAnchorPosition != TextField.selectionFocusPosition)
     {
-        // Check if there is any text selected
-        if (TextField.selectionAnchorPosition != TextField.selectionFocusPosition)
+        int startIndex = Mathf.Min(TextField.selectionAnchorPosition, TextField.selectionFocusPosition);
+        int endIndex = Mathf.Max(TextField.selectionAnchorPosition, TextField.selectionFocusPosition);
+
+        // Ensure indices are within valid range
+        if (startIndex >= 0 && endIndex <= TextField.text.Length)
         {
-            int startIndex = Mathf.Min(TextField.selectionAnchorPosition, TextField.selectionFocusPosition);
-            int endIndex = Mathf.Max(TextField.selectionAnchorPosition, TextField.selectionFocusPosition);
+            // Get the selected text
+            string selectedText = TextField.text.Substring(startIndex, endIndex - startIndex);
 
-            // Ensure that both indices are within the valid range of the text length
-            if (startIndex >= 0 && endIndex <= TextField.text.Length)
+            if (!string.IsNullOrEmpty(selectedText))
             {
-                // Get the selected text
-                string selectedText = TextField.text.Substring(startIndex, endIndex - startIndex);
-
-                if (selectedText != "")
+                string newText;
+                
+                // Check if text is already bold (surrounded by <b> tags)
+                if (selectedText.StartsWith("<b>") && selectedText.EndsWith("</b>"))
                 {
-                    // Create bolded version with TMPro rich text tags
-                    string boldText = "<b>" + selectedText + "</b>";
-
-                    // Get the text before and after the selection
-                    string textBeforeSelection = TextField.text.Substring(0, startIndex);
-                    string textAfterSelection = TextField.text.Substring(endIndex);
-
-                    // Create the new text with the bold formatting
-                    string newText = textBeforeSelection + boldText + textAfterSelection;
-
-                    // Update the text field
-                    TextField.text = newText;
-
-                    // Update undo stack
-                    undoStack.Push(TextField.text);
-
-                    // Update the caret position to be after the bolded text
-                    TextField.caretPosition = startIndex + boldText.Length;
-
-                    // Mark document as changed
-                    ButtonManager.Instance.SaveButton.GetComponent<ButtonController>().SetInteractable(true);
+                    // Remove bold tags
+                    newText = selectedText.Substring(3, selectedText.Length - 7);
                 }
                 else
                 {
-                    Debug.Log("No text is selected.");
+                    // Add bold tags
+                    newText = "<b>" + selectedText + "</b>";
                 }
+
+                // Replace the selected text with the modified text
+                string textBeforeSelection = TextField.text.Substring(0, startIndex);
+                string textAfterSelection = TextField.text.Substring(endIndex);
+                TextField.text = textBeforeSelection + newText + textAfterSelection;
+
+                // Update selection to include the new text with tags
+                TextField.selectionAnchorPosition = startIndex;
+                TextField.selectionFocusPosition = startIndex + newText.Length;
+                
+                // Since we've modified the text, ensure undo functionality works
+                undoStack.Push(TextField.text);
+                ButtonManager.Instance.UndoButton.GetComponent<ButtonController>().SetInteractable(true);
+                ButtonManager.Instance.SaveButton.GetComponent<ButtonController>().SetInteractable(true);
             }
         }
-        else
-        {
-            Debug.Log("No text is selected.");
-        }
     }
-
+    else
+    {
+        Debug.Log("No text is selected for bold formatting.");
+    }
+}
 }
