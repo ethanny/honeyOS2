@@ -17,7 +17,7 @@ namespace HoneyOS.VoiceControl
     public class MicrophoneDemo : MonoBehaviour
     {
         [Header("Picovoice Settings")]
-        public string accessKey = "YOUR_ACCESS_KEY_HERE"; // Replace with your Picovoice access key
+        public string accessKey = "tFwk5W4ttKaMr2u4kSVxR+APT/2pBveVDmVCzKKIY2CyYieVgXthdg=="; // Replace with your Picovoice access key
         public string contextPath = "honeyos_context.rhn"; // Path to your custom context file
         public bool autoRestartListening = false; // Automatically restart listening after each command
         public float restartDelay = 1.0f; // Delay before restarting (in seconds)
