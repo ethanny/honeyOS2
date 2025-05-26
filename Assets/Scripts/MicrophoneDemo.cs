@@ -37,6 +37,9 @@ namespace HoneyOS.VoiceControl
         public ProcessManager processManager;
         public PageController2 scheduler;
 
+        public PageController3 pageReplacementNav;
+        public AlgorithmManager algorithmManager;
+
         [Header("UI")]
         public Button button;
         public TextMeshProUGUI outputText;
@@ -67,6 +70,13 @@ namespace HoneyOS.VoiceControl
         private float lastAudioCheckTime = 0f;
         private float audioCheckInterval = 30f; // Check every 30 seconds
         private float noAudioTimeout = 120f; // Reset after 2 minutes of no audio
+
+        [Header("Error Recovery")]
+        private bool isMicrophoneRecoveryInProgress = false;
+        private float microphoneRecoveryInterval = 5f; // Try recovery every 5 seconds
+        private float lastMicrophoneRecoveryAttempt = 0f;
+        private int maxRecoveryAttempts = 3;
+        private int currentRecoveryAttempts = 0;
 
         private void Awake()
         {
@@ -172,7 +182,7 @@ namespace HoneyOS.VoiceControl
                 { "open sweet", ( () => desktopManager.OpenApp(0), "Opening Sweet") },
                 { "openSugar", ( () => desktopManager.OpenApp(3), "Opening Sugar") },
                 { "open sugar", ( () => desktopManager.OpenApp(3), "Opening Sugar") },
-                { "open blueberry", ( () => desktopManager.OpenApp(2), "Opening Sugar") },
+                { "openBlueberry", ( () => desktopManager.OpenApp(2), "Opening Blueberry") },
                 { "openCake", ( () => desktopManager.OpenApp(1), "Opening Cake") },
                 { "open cake", ( () => desktopManager.OpenApp(1), "Opening Cake") },
                 { "closeApp", ( () => desktopManager.CloseCurrentApp(), "Closing app") },
@@ -182,15 +192,36 @@ namespace HoneyOS.VoiceControl
                 { "minimizeApp", ( () => desktopManager.MinCurrentApp(), "Minimizing app") },
                 { "minimize application", ( () => desktopManager.MinCurrentApp(), "Minimizing app") },
                 
-                // File Operations
-                { "saveFile", ( () => textEditor.Save(), "Saving File") },
-                { "save file", ( () => textEditor.Save(), "Saving File") },
-                { "saveAsFile", ( () => textEditor.SaveAs(), "Saving File As") },
-                { "save as file", ( () => textEditor.SaveAs(), "Saving File As") },
-                { "openFile", ( () => textEditor.OpenFile(), "Opening File") },
-                { "open file", ( () => textEditor.OpenFile(), "Opening File") },
-                { "newFile", ( () => textEditor.NewFile(), "Creating New File") },
-                { "new file", ( () => textEditor.NewFile(), "Creating New File") },
+                // File Operations - with error handling
+                { "saveFile", ( () => {
+                    try {
+                        textEditor.Save();
+                    }
+                    catch (System.Exception ex) {
+                        UnityEngine.Debug.LogError($"Error saving file: {ex.Message}");
+                        throw; // Rethrow to be handled by ExecuteIntent
+                    }
+                }, "Saving File") },
+                
+                { "saveAsFile", ( () => {
+                    try {
+                        textEditor.SaveAs();
+                    }
+                    catch (System.Exception ex) {
+                        UnityEngine.Debug.LogError($"Error in save as operation: {ex.Message}");
+                        throw; // Rethrow to be handled by ExecuteIntent
+                    }
+                }, "Saving File As") },
+                
+                { "openFile", ( () => {
+                    try {
+                        textEditor.OpenFile();
+                    }
+                    catch (System.Exception ex) {
+                        UnityEngine.Debug.LogError($"Error opening file: {ex.Message}");
+                        throw; // Rethrow to be handled by ExecuteIntent
+                    }
+                }, "Opening File") },
                 
                 // Text Editing
                 { "undo", ( () => textEditor.Undo(), "Undo text changes") },
@@ -210,6 +241,7 @@ namespace HoneyOS.VoiceControl
                 { "open about us", ( () => help.OpenAboutUs(), "Opening About Us") },
                 
                 // Scheduler Operations
+                { "homeScheduler", ( () => scheduler.OpenHome(), "Going back to Cake Ville") },
                 { "startCake", ( () => scheduler.OpenSelectionPage(), "Opening Policy selector") },
                 { "start cake", ( () => scheduler.OpenSelectionPage(), "Opening Policy selector") },
                 { "backToPolicySelection", ( () => {scheduler.OpenSelectionPage(); processManager.Stop();}, "Opening Policy selector") },
@@ -234,6 +266,34 @@ namespace HoneyOS.VoiceControl
                 { "add process", ( () => processManager.AddProcess(false), "Adding Process") },
                 { "nextStep", ( () => processManager.Next(), "Next step") },
                 { "next", ( () => processManager.Next(), "Next step") },
+
+                //Page Algorithms
+                { "homeBlueberry", ( () => pageReplacementNav.OpenHome(), "Going back to Blueberry Ville") },
+                { "startBlueberry", ( () => pageReplacementNav.OpenSelectionPage(), "Opening Algorithm selector") },
+                { "backToAlgorithmSelection", ( () => {pageReplacementNav.OpenSelectionPage(); algorithmManager.Reset();}, "Opening Algorithm selector") },
+                { "chooseFIFO", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
+                { "chooseOPR", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
+                { "chooseLRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
+                { "chooseMRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
+                { "chooseLFU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
+                { "simulateAlgorithm", ( () => { algorithmManager.ProcessReferenceString();  algorithmManager.RunSelectedAlgorithm();}, "Starting simulation") },
+                { "pauseAlgorithm", ( () => { algorithmManager.TogglePause();}, "Pausing simulation") },
+                { "resumeAlgorithm", ( () => { algorithmManager.TogglePause();}, "Resuming simulation") },
+                { "resetAlgorithm", ( () => { algorithmManager.Reset();}, "Stopping simulation") },
+
+                //Frame Count
+                { "increaseFrames", ( () => { algorithmManager.UpdateFrameCount(algorithmManager.frameCountSlider.value + 1); algorithmManager.frameCountSlider.value += 1; }, "Increasing frame count") },
+                { "decreaseFrames", ( () => { algorithmManager.UpdateFrameCount(algorithmManager.frameCountSlider.value - 1); algorithmManager.frameCountSlider.value -= 1; }, "Decreasing frame count") },
+                { "setFrameCount1", ( () => { algorithmManager.UpdateFrameCount(1); algorithmManager.frameCountSlider.value = 1; }, "Setting frame count to 1") },
+                { "setFrameCount2", ( () => { algorithmManager.UpdateFrameCount(2); algorithmManager.frameCountSlider.value = 2; }, "Setting frame count to 2") },
+                { "setFrameCount3", ( () => { algorithmManager.UpdateFrameCount(3); algorithmManager.frameCountSlider.value = 3; }, "Setting frame count to 3") },
+                { "setFrameCount4", ( () => { algorithmManager.UpdateFrameCount(4); algorithmManager.frameCountSlider.value = 4;}, "Setting frame count to 4") },
+                { "setFrameCount5", ( () => { algorithmManager.UpdateFrameCount(5); algorithmManager.frameCountSlider.value = 5;}, "Setting frame count to 5") },
+                { "setFrameCount6", ( () => { algorithmManager.UpdateFrameCount(6); algorithmManager.frameCountSlider.value = 6;}, "Setting frame count to 6") },
+                { "setFrameCount7", ( () => { algorithmManager.UpdateFrameCount(7); algorithmManager.frameCountSlider.value = 7; }, "Setting frame count to 7") },
+
+                //maximize
+                { "changeSize", ( () => { algorithmManager.Reset();}, "Changing app window size") },
             };
         }
 
@@ -242,33 +302,46 @@ namespace HoneyOS.VoiceControl
             HandleSpaceBarInput();
             UpdateVADIndicator();
             MonitorAudioCapture();
+            CheckMicrophoneStatus();
         }
 
         private void UpdateVADIndicator()
         {
-            Color color;
-
-            if (isListening)
+            try
             {
-                // Use microphone manager's voice detection if available and recording
-                if (microphoneManager != null && microphoneManager.IsRecording)
+                Color color;
+
+                if (isListening)
                 {
-                    color = microphoneManager.IsVoiceDetected ? voiceDetectedColor : voiceUndetectedColor;
+                    // Check if we're in recovery mode
+                    if (isMicrophoneRecoveryInProgress)
+                    {
+                        color = Color.yellow; // Yellow indicates recovery in progress
+                    }
+                    // Use microphone manager's voice detection if available and recording
+                    else if (microphoneManager != null && microphoneManager.IsRecording)
+                    {
+                        color = microphoneManager.IsVoiceDetected ? voiceDetectedColor : voiceUndetectedColor;
+                    }
+                    else
+                    {
+                        color = defaultIndicatorColor;
+                    }
                 }
                 else
                 {
-                    // If we're listening but not yet recording (during initial sound), show as active
-                    color = voiceDetectedColor;
+                    color = defaultIndicatorColor;
+                }
+
+                if (vadIndicatorImage != null)
+                {
+                    vadIndicatorImage.color = color;
                 }
             }
-            else
+            catch (System.Exception ex)
             {
-                color = defaultIndicatorColor;
-            }
-
-            if (vadIndicatorImage != null)
-            {
-                vadIndicatorImage.color = color;
+                UnityEngine.Debug.LogError($"Error updating VAD indicator: {ex.Message}");
+                // Don't let indicator errors affect the rest of the system
             }
         }
 
@@ -296,6 +369,17 @@ namespace HoneyOS.VoiceControl
                     return;
                 }
 
+                // Check if microphone manager is working
+                if (microphoneManager == null || !microphoneManager.IsRecording)
+                {
+                    AttemptMicrophoneRecovery();
+                    if (microphoneManager == null || !microphoneManager.IsRecording)
+                    {
+                        DisplayOutputText("Microphone not available. Attempting recovery...");
+                        return;
+                    }
+                }
+
                 // Check if Rhino is properly initialized
                 if (rhinoManager == null)
                 {
@@ -311,22 +395,16 @@ namespace HoneyOS.VoiceControl
                 // Debug check for audio components
                 if (audioSource == null)
                 {
-                    UnityEngine.Debug.LogError("AudioSource is null!");
-                    return;
+                    audioSource = gameObject.AddComponent<AudioSource>();
+                    ConfigureAudioSource();
                 }
-                if (whatCanIDoSound == null)
-                {
-                    UnityEngine.Debug.LogError("whatCanIDoSound clip is not assigned!");
-                    return;
-                }
-
+                
                 StartCoroutine(StartListeningAfterSound());
             }
             catch (System.Exception ex)
             {
                 UnityEngine.Debug.LogError($"Failed to start listening: {ex.Message}");
-                InitializeRhino();
-                DisplayOutputText("Failed to start voice recognition");
+                AttemptMicrophoneRecovery();
             }
         }
 
@@ -475,38 +553,106 @@ namespace HoneyOS.VoiceControl
 
         private void ExecuteIntent(string intent, Dictionary<string, string> slots)
         {
-            // First try exact match
-            if (intentActionDictionary.ContainsKey(intent))
+            try
             {
-                var action = intentActionDictionary[intent];
-                action.function();
-                DisplayOutputText(action.message);
-                return;
-            }
-            
-            // If no exact match, try to find a partial match or similar intent
-            foreach (var kvp in intentActionDictionary)
-            {
-                // Try case-insensitive match
-                if (string.Equals(kvp.Key, intent, StringComparison.OrdinalIgnoreCase))
+                // First try exact match
+                if (intentActionDictionary.ContainsKey(intent))
                 {
-                    kvp.Value.function();
-                    DisplayOutputText(kvp.Value.message);
+                    var action = intentActionDictionary[intent];
+                    try
+                    {
+                        action.function();
+                        DisplayOutputText(action.message);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        // Log the error but don't let it affect the microphone
+                        UnityEngine.Debug.LogError($"Error executing intent '{intent}': {ex.Message}");
+                        DisplayOutputText("Sorry, that action couldn't be completed. Please try again.");
+                        
+                        // If this was a file operation error, handle it gracefully
+                        if (ex is System.DllNotFoundException || ex.Message.Contains("StandaloneFileBrowser"))
+                        {
+                            DisplayOutputText("File operation failed. Please try again.");
+                        }
+                        
+                        // Ensure microphone keeps running
+                        EnsureMicrophoneStaysActive();
+                    }
                     return;
                 }
                 
-                // Try partial match (intent contains key or key contains intent)
-                if (intent.ToLower().Contains(kvp.Key.ToLower()) || kvp.Key.ToLower().Contains(intent.ToLower()))
+                // If no exact match, try to find a partial match or similar intent
+                foreach (var kvp in intentActionDictionary)
                 {
-                    kvp.Value.function();
-                    DisplayOutputText(kvp.Value.message);
-                    return;
+                    // Try case-insensitive match
+                    if (string.Equals(kvp.Key, intent, StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            kvp.Value.function();
+                            DisplayOutputText(kvp.Value.message);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            UnityEngine.Debug.LogError($"Error executing intent '{intent}': {ex.Message}");
+                            DisplayOutputText("Sorry, that action couldn't be completed. Please try again.");
+                            EnsureMicrophoneStaysActive();
+                        }
+                        return;
+                    }
+                    
+                    // Try partial match (intent contains key or key contains intent)
+                    if (intent.ToLower().Contains(kvp.Key.ToLower()) || kvp.Key.ToLower().Contains(intent.ToLower()))
+                    {
+                        try
+                        {
+                            kvp.Value.function();
+                            DisplayOutputText(kvp.Value.message);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            UnityEngine.Debug.LogError($"Error executing intent '{intent}': {ex.Message}");
+                            DisplayOutputText("Sorry, that action couldn't be completed. Please try again.");
+                            EnsureMicrophoneStaysActive();
+                        }
+                        return;
+                    }
+                }
+                
+                // If still no match, log for debugging
+                UnityEngine.Debug.LogWarning($"No match found for intent: '{intent}'");
+                DisplayOutputText("Command not recognized.");
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Error in ExecuteIntent: {ex.Message}");
+                DisplayOutputText("Sorry, there was an error processing your command.");
+                EnsureMicrophoneStaysActive();
+            }
+        }
+
+        private void EnsureMicrophoneStaysActive()
+        {
+            try
+            {
+                // Check if we need to recover the microphone
+                if (microphoneManager == null || !microphoneManager.IsRecording)
+                {
+                    UnityEngine.Debug.Log("Ensuring microphone stays active after error...");
+                    AttemptMicrophoneRecovery();
+                }
+                
+                // If Rhino stopped processing, restart it
+                if (rhinoManager != null && isListening)
+                {
+                    StartCoroutine(DelayedProcessingStart());
                 }
             }
-            
-            // If still no match, log for debugging
-            UnityEngine.Debug.LogWarning($"No match found for intent: '{intent}'");
-            DisplayOutputText("Command not recognized.");
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Error in EnsureMicrophoneStaysActive: {ex.Message}");
+            }
         }
 
         private void DisplayOutputText(string message)
@@ -811,6 +957,91 @@ namespace HoneyOS.VoiceControl
                 UnityEngine.Debug.LogError($"Failed to reinitialize audio capture: {ex.Message}");
                 isListening = false;
                 DisplayOutputText("Failed to restart audio. Please try again.");
+            }
+        }
+
+        private void CheckMicrophoneStatus()
+        {
+            if (microphoneManager == null || !microphoneManager.IsRecording)
+            {
+                // Only attempt recovery if we're not already in recovery and enough time has passed
+                if (!isMicrophoneRecoveryInProgress && Time.time - lastMicrophoneRecoveryAttempt >= microphoneRecoveryInterval)
+                {
+                    AttemptMicrophoneRecovery();
+                }
+            }
+            else
+            {
+                // Reset recovery attempts if microphone is working
+                currentRecoveryAttempts = 0;
+            }
+        }
+
+        private void AttemptMicrophoneRecovery()
+        {
+            if (currentRecoveryAttempts >= maxRecoveryAttempts)
+            {
+                UnityEngine.Debug.LogWarning("Max microphone recovery attempts reached. Please restart the application.");
+                DisplayOutputText("Microphone recovery failed. Please restart the application.");
+                return;
+            }
+
+            isMicrophoneRecoveryInProgress = true;
+            lastMicrophoneRecoveryAttempt = Time.time;
+            currentRecoveryAttempts++;
+
+            try
+            {
+                UnityEngine.Debug.Log($"Attempting microphone recovery (Attempt {currentRecoveryAttempts}/{maxRecoveryAttempts})...");
+                
+                // Safely clean up existing components
+                if (microphoneManager != null)
+                {
+                    Destroy(microphoneManager);
+                    microphoneManager = null;
+                }
+
+                // Create new microphone manager
+                microphoneManager = gameObject.AddComponent<PicovoiceMicrophoneManager>();
+                
+                // Only reinitialize Rhino if it's null or not functioning
+                if (rhinoManager == null)
+                {
+                    InitializeRhino();
+                }
+
+                if (isListening)
+                {
+                    StartCoroutine(DelayedProcessingStart());
+                }
+
+                DisplayOutputText("Microphone recovered successfully.");
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Microphone recovery attempt {currentRecoveryAttempts} failed: {ex.Message}");
+                DisplayOutputText("Attempting to recover microphone...");
+            }
+            finally
+            {
+                isMicrophoneRecoveryInProgress = false;
+            }
+        }
+
+        private IEnumerator DelayedProcessingStart()
+        {
+            yield return new WaitForSeconds(0.5f);
+            
+            try
+            {
+                if (rhinoManager != null && microphoneManager != null && microphoneManager.IsRecording)
+                {
+                    rhinoManager.Process();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Failed to start processing after recovery: {ex.Message}");
             }
         }
     }
