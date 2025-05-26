@@ -293,7 +293,13 @@ namespace HoneyOS.VoiceControl
                 { "setFrameCount7", ( () => { algorithmManager.UpdateFrameCount(7); algorithmManager.frameCountSlider.value = 7; }, "Setting frame count to 7") },
 
                 //maximize
-                { "changeSize", ( () => { algorithmManager.Reset();}, "Changing app window size") },
+                { "changeSize", ( () => { 
+                    if (desktopManager.CurrentAppInstance != null && 
+                        desktopManager.CurrentAppInstance.GetComponent<WindowMaximizer>() != null)
+                    {
+                        desktopManager.CurrentAppInstance.GetComponent<WindowMaximizer>().ToggleMaximize();
+                    }
+                }, "Changing app window size") },
             };
         }
 

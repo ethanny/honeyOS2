@@ -1,5 +1,3 @@
-
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -45,11 +43,11 @@ public class App : MonoBehaviour
             {
                 windowMaximizer.SetWindowState(wasMaximizedBeforeMinimize);
             }
-            else
-            {
-                // Opening from closed state - start in normal mode
-                windowMaximizer.SetWindowState(false);
-            }
+            // else
+            // {
+            //     // Opening from closed state - start in normal mode
+            //     windowMaximizer.SetWindowState(false);
+            // }
         }
     }
 
@@ -86,7 +84,7 @@ public class App : MonoBehaviour
         if (windowMaximizer != null)
         {
             wasMaximizedBeforeMinimize = windowMaximizer.IsMaximized;
-            windowMaximizer.SetWindowState(false); // Always restore to normal size when minimizing
+            // windowMaximizer.SetWindowState(false); // Always restore to normal size when minimizing
         }
         
         animator.Play("Close");
@@ -115,6 +113,3 @@ public class App : MonoBehaviour
         }
     }
 }
-
-
-
