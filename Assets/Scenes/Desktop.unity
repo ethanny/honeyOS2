@@ -2110,7 +2110,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   r: {x: 0, y: 20, z: 0, w: 0}
-  rect2props: {x: -4.9999847, y: -5, z: 90.5469, w: 83.47583}
+  rect2props: {x: -4.9999886, y: -5.000004, z: 90.54746, w: 83.476395}
   image: {fileID: 66052430}
 --- !u!114 &66052429
 MonoBehaviour:
@@ -2403,7 +2403,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   r: {x: 0, y: 0, z: 20, w: 20}
-  rect2props: {x: 0.000061035156, y: 9.999878, z: 851.5855, w: 851.5855}
+  rect2props: {x: 0.00012207031, y: 10, z: 851.58887, w: 851.58887}
   image: {fileID: 115800553}
 --- !u!222 &115800555
 CanvasRenderer:
@@ -2528,9 +2528,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 419.2809, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 419.27838, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.74304, a: 866.74304}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.7446, a: 866.7446}
   m_BuildTextureStacks: []
 --- !u!1001 &123746163
 PrefabInstance:
@@ -2709,9 +2709,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.5287, g: 397.795, b: 0, a: 0}
+    - _halfSize: {r: 816.53345, g: 397.795, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.000061035156, g: 9.999878, b: 851.5855, a: 851.5855}
+    - _rect2props: {r: 0.00012207031, g: 10, b: 851.58887, a: 851.58887}
   m_BuildTextureStacks: []
 --- !u!1 &145803798
 GameObject:
@@ -3602,7 +3602,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   r: {x: 0, y: 20, z: 0, w: 0}
-  rect2props: {x: -4.9999847, y: -5, z: 90.5469, w: 83.47583}
+  rect2props: {x: -4.9999886, y: -5.000004, z: 90.54746, w: 83.476395}
   image: {fileID: 219485235}
 --- !u!114 &219485234
 MonoBehaviour:
@@ -4191,9 +4191,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 21.033386, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 21.033264, b: 0, a: 0}
     - _r: {r: 20, g: 20, b: 0, a: 0}
-    - _rect2props: {r: 0.000061035156, g: -10, b: 585.13947, a: 585.13947}
+    - _rect2props: {r: 0.000061035156, g: -10.000061, b: 585.14276, a: 585.14276}
   m_BuildTextureStacks: []
 --- !u!1001 &271937247
 PrefabInstance:
@@ -5433,7 +5433,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   r: {x: 0, y: 0, z: 20, w: 20}
-  rect2props: {x: 0.00012207031, y: 10, z: 851.5617, w: 851.5617}
+  rect2props: {x: 0.00012207031, y: 9.999878, z: 851.5651, w: 851.5651}
   image: {fileID: 273741944}
 --- !u!222 &273741946
 CanvasRenderer:
@@ -6106,9 +6106,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 419.2809, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 419.27838, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.74304, a: 866.74304}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.7446, a: 866.7446}
   m_BuildTextureStacks: []
 --- !u!1 &314826467
 GameObject:
@@ -6691,9 +6691,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 21.033386, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 21.033264, b: 0, a: 0}
     - _r: {r: 20, g: 20, b: 0, a: 0}
-    - _rect2props: {r: 0.000061035156, g: -10, b: 585.13947, a: 585.13947}
+    - _rect2props: {r: 0.000061035156, g: -10.000061, b: 585.14276, a: 585.14276}
   m_BuildTextureStacks: []
 --- !u!1 &332722864
 GameObject:
@@ -6984,9 +6984,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 98.05264, g: 30, b: 0, a: 0}
+    - _halfSize: {r: 98.05344, g: 30, b: 0, a: 0}
     - _r: {r: 20, g: 0, b: 0, a: 0}
-    - _rect2props: {r: 5.0000153, g: -5, b: 83.47583, a: 90.5469}
+    - _rect2props: {r: 5.000023, g: -5.000004, b: 83.476395, a: 90.54746}
   m_BuildTextureStacks: []
 --- !u!21 &344486241
 Material:
@@ -8861,9 +8861,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 21.033386, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 21.033264, b: 0, a: 0}
     - _r: {r: 20, g: 20, b: 0, a: 0}
-    - _rect2props: {r: 0.000061035156, g: -10, b: 585.13947, a: 585.13947}
+    - _rect2props: {r: 0.000061035156, g: -10.000061, b: 585.14276, a: 585.14276}
   m_BuildTextureStacks: []
 --- !u!21 &470157709
 Material:
@@ -9849,7 +9849,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   r: {x: 20, y: 0, z: 0, w: 0}
-  rect2props: {x: 5.0000153, y: -5, z: 83.47583, w: 90.5469}
+  rect2props: {x: 5.000023, y: -5.000004, z: 83.476395, w: 90.54746}
   image: {fileID: 526015104}
 --- !u!114 &526015103
 MonoBehaviour:
@@ -10188,7 +10188,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 426.14502, y: 0}
+  m_AnchoredPosition: {x: 632.655, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &549726957
@@ -10891,9 +10891,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 21.033386, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 21.033264, b: 0, a: 0}
     - _r: {r: 20, g: 20, b: 0, a: 0}
-    - _rect2props: {r: 0.000061035156, g: -10, b: 585.13947, a: 585.13947}
+    - _rect2props: {r: 0.000061035156, g: -10.000061, b: 585.14276, a: 585.14276}
   m_BuildTextureStacks: []
 --- !u!21 &600090771
 Material:
@@ -11635,9 +11635,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 98.05264, g: 30, b: 0, a: 0}
+    - _halfSize: {r: 98.05344, g: 30, b: 0, a: 0}
     - _r: {r: 0, g: 20, b: 0, a: 0}
-    - _rect2props: {r: -4.9999847, g: -5, b: 90.5469, a: 83.47583}
+    - _rect2props: {r: -4.9999886, g: -5.000004, b: 90.54746, a: 83.476395}
   m_BuildTextureStacks: []
 --- !u!1 &646673463
 GameObject:
@@ -12052,7 +12052,7 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _WidthHeightRadius: {r: 578.03, g: 71.29, b: 40, a: 0}
+    - _WidthHeightRadius: {r: 784.54004, g: 71.29, b: 40, a: 0}
   m_BuildTextureStacks: []
 --- !u!1 &674472738
 GameObject:
@@ -12534,9 +12534,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.67615, g: 419.1409, b: 0, a: 0}
+    - _halfSize: {r: 816.6809, g: 419.13837, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.7836, a: 866.7836}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.78516, a: 866.78516}
   m_BuildTextureStacks: []
 --- !u!1 &694711663
 GameObject:
@@ -13836,7 +13836,7 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _WidthHeightRadius: {r: 1176.6317, g: 225.00165, b: 0, a: 0}
+    - _WidthHeightRadius: {r: 1176.6412, g: 224.99658, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!21 &790689766
 Material:
@@ -13875,9 +13875,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.67615, g: 419.1409, b: 0, a: 0}
+    - _halfSize: {r: 816.6809, g: 419.13837, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.7836, a: 866.7836}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.78516, a: 866.78516}
   m_BuildTextureStacks: []
 --- !u!21 &801134191
 Material:
@@ -13955,9 +13955,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 419.2809, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 419.27838, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.74304, a: 866.74304}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.7446, a: 866.7446}
   m_BuildTextureStacks: []
 --- !u!1001 &810302721
 PrefabInstance:
@@ -14456,9 +14456,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 419.2809, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 419.27838, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.74304, a: 866.74304}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.7446, a: 866.7446}
   m_BuildTextureStacks: []
 --- !u!21 &857322320
 Material:
@@ -14536,9 +14536,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 419.2809, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 419.27838, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.74304, a: 866.74304}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.7446, a: 866.7446}
   m_BuildTextureStacks: []
 --- !u!21 &877296630
 Material:
@@ -14764,9 +14764,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 21.033386, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 21.033264, b: 0, a: 0}
     - _r: {r: 20, g: 20, b: 0, a: 0}
-    - _rect2props: {r: 0.000061035156, g: -10, b: 585.13947, a: 585.13947}
+    - _rect2props: {r: 0.000061035156, g: -10.000061, b: 585.14276, a: 585.14276}
   m_BuildTextureStacks: []
 --- !u!1 &894499139
 GameObject:
@@ -14954,9 +14954,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 419.2809, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 419.27838, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.74304, a: 866.74304}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.7446, a: 866.7446}
   m_BuildTextureStacks: []
 --- !u!1 &895517679
 GameObject:
@@ -16849,7 +16849,7 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _WidthHeightRadius: {r: 1176.6317, g: 225.00165, b: 0, a: 0}
+    - _WidthHeightRadius: {r: 1176.6412, g: 224.99658, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!1001 &997404216
 PrefabInstance:
@@ -17150,9 +17150,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 419.2809, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 419.27838, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.74304, a: 866.74304}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.7446, a: 866.7446}
   m_BuildTextureStacks: []
 --- !u!21 &1007747726
 Material:
@@ -17682,7 +17682,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   r: {x: 0, y: 0, z: 20, w: 20}
-  rect2props: {x: 0.00012207031, y: 10, z: 851.5617, w: 851.5617}
+  rect2props: {x: 0.00012207031, y: 9.999878, z: 851.5651, w: 851.5651}
   image: {fileID: 1085811630}
 --- !u!222 &1085811629
 CanvasRenderer:
@@ -18934,9 +18934,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.51, g: 397.78006, b: 0, a: 0}
+    - _halfSize: {r: 816.5148, g: 397.78006, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 10, b: 851.5617, a: 851.5617}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 851.5651, a: 851.5651}
   m_BuildTextureStacks: []
 --- !u!21 &1211914904
 Material:
@@ -19147,9 +19147,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 98.05264, g: 30, b: 0, a: 0}
+    - _halfSize: {r: 98.05344, g: 30, b: 0, a: 0}
     - _r: {r: 0, g: 20, b: 0, a: 0}
-    - _rect2props: {r: -4.9999847, g: -5, b: 90.5469, a: 83.47583}
+    - _rect2props: {r: -4.9999886, g: -5.000004, b: 90.54746, a: 83.476395}
   m_BuildTextureStacks: []
 --- !u!1001 &1228835978
 PrefabInstance:
@@ -20148,7 +20148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   r: {x: 0, y: 0, z: 20, w: 20}
-  rect2props: {x: 0.000061035156, y: 9.999878, z: 851.5855, w: 851.5855}
+  rect2props: {x: 0.00012207031, y: 10, z: 851.58887, w: 851.58887}
   image: {fileID: 1300473585}
 --- !u!222 &1300473587
 CanvasRenderer:
@@ -20416,7 +20416,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 264.26, y: 0}
+  m_AnchoredPosition: {x: 367.515, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1371402874
@@ -21193,9 +21193,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.5287, g: 397.795, b: 0, a: 0}
+    - _halfSize: {r: 816.53345, g: 397.795, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.000061035156, g: 9.999878, b: 851.5855, a: 851.5855}
+    - _rect2props: {r: 0.00012207031, g: 10, b: 851.58887, a: 851.58887}
   m_BuildTextureStacks: []
 --- !u!1001 &1445241544
 PrefabInstance:
@@ -22803,7 +22803,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   r: {x: 20, y: 0, z: 0, w: 0}
-  rect2props: {x: 5.0000153, y: -5, z: 83.47583, w: 90.5469}
+  rect2props: {x: 5.000023, y: -5.000004, z: 83.476395, w: 90.54746}
   image: {fileID: 1524120914}
 --- !u!114 &1524120913
 MonoBehaviour:
@@ -23853,9 +23853,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 98.05264, g: 30, b: 0, a: 0}
+    - _halfSize: {r: 98.05344, g: 30, b: 0, a: 0}
     - _r: {r: 20, g: 0, b: 0, a: 0}
-    - _rect2props: {r: 5.0000153, g: -5, b: 83.47583, a: 90.5469}
+    - _rect2props: {r: 5.000023, g: -5.000004, b: 83.476395, a: 90.54746}
   m_BuildTextureStacks: []
 --- !u!21 &1607375080
 Material:
@@ -25279,9 +25279,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.47876, g: 419.2809, b: 0, a: 0}
+    - _halfSize: {r: 816.4835, g: 419.27838, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.74304, a: 866.74304}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 866.7446, a: 866.7446}
   m_BuildTextureStacks: []
 --- !u!21 &1718524996
 Material:
@@ -27875,9 +27875,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 816.51, g: 397.78006, b: 0, a: 0}
+    - _halfSize: {r: 816.5148, g: 397.78006, b: 0, a: 0}
     - _r: {r: 0, g: 0, b: 20, a: 20}
-    - _rect2props: {r: 0.00012207031, g: 10, b: 851.5617, a: 851.5617}
+    - _rect2props: {r: 0.00012207031, g: 9.999878, b: 851.5651, a: 851.5651}
   m_BuildTextureStacks: []
 --- !u!1 &1947347543
 GameObject:
@@ -29457,7 +29457,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 596, y: -230.00003}
+  m_AnchoredPosition: {x: 596, y: -230.00002}
   m_SizeDelta: {x: -1239.2461, y: -523.5502}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2051219420
@@ -29549,7 +29549,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   r: {x: 0, y: 0, z: 20, w: 20}
-  rect2props: {x: 0.00012207031, y: 9.999878, z: 866.7836, w: 866.7836}
+  rect2props: {x: 0.00012207031, y: 9.999878, z: 866.78516, w: 866.78516}
   image: {fileID: 2051219422}
 --- !u!1001 &2053665223
 PrefabInstance:
@@ -30412,7 +30412,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   r: {x: 0, y: 0, z: 20, w: 20}
-  rect2props: {x: 0.00012207031, y: 9.999878, z: 866.7836, w: 866.7836}
+  rect2props: {x: 0.00012207031, y: 9.999878, z: 866.78516, w: 866.78516}
   image: {fileID: 2119923519}
 --- !u!114 &2119923519
 MonoBehaviour:
@@ -31642,7 +31642,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 89491696101492845, guid: 940c056ccf3cd4ac69f852f1c21cd685, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ToggleBold
+      value: Cut
       objectReference: {fileID: 0}
     - target: {fileID: 89491696101492845, guid: 940c056ccf3cd4ac69f852f1c21cd685, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -32763,7 +32763,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   autoStartMicrophone: 1
   sampleRate: 16000
-  maxRecordingLength: 10
+  maxRecordingLength: 100
   enableVAD: 1
   vadThreshold: 0.01
   vadSilenceDuration: 1

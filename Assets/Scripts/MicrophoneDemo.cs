@@ -63,12 +63,22 @@ namespace HoneyOS.VoiceControl
         private bool isLongLongPressTriggered = false;
         private bool isListening = false;
 
+        [Header("Audio Monitoring")]
+        private float lastAudioCheckTime = 0f;
+        private float audioCheckInterval = 30f; // Check every 30 seconds
+        private float noAudioTimeout = 120f; // Reset after 2 minutes of no audio
+
         private void Awake()
         {
+            // Initialize AudioSource
+            audioSource = GetComponent<AudioSource>();
             if (audioSource == null)
             {
                 audioSource = gameObject.AddComponent<AudioSource>();
             }
+            
+            // Always configure AudioSource settings
+            ConfigureAudioSource();
 
             // Get or add microphone manager
             microphoneManager = GetComponent<PicovoiceMicrophoneManager>();
@@ -231,6 +241,7 @@ namespace HoneyOS.VoiceControl
         {
             HandleSpaceBarInput();
             UpdateVADIndicator();
+            MonitorAudioCapture();
         }
 
         private void UpdateVADIndicator()
@@ -239,16 +250,26 @@ namespace HoneyOS.VoiceControl
 
             if (isListening)
             {
-                // Use microphone manager's voice detection if available
+                // Use microphone manager's voice detection if available and recording
                 if (microphoneManager != null && microphoneManager.IsRecording)
+                {
                     color = microphoneManager.IsVoiceDetected ? voiceDetectedColor : voiceUndetectedColor;
+                }
                 else
+                {
+                    // If we're listening but not yet recording (during initial sound), show as active
                     color = voiceDetectedColor;
+                }
             }
             else
+            {
                 color = defaultIndicatorColor;
+            }
 
-            vadIndicatorImage.color = color;
+            if (vadIndicatorImage != null)
+            {
+                vadIndicatorImage.color = color;
+            }
         }
 
         private void OnButtonPressed()
@@ -287,25 +308,79 @@ namespace HoneyOS.VoiceControl
                     }
                 }
 
-                audioSource.clip = startRecordingSound;
-                audioSource.Play();
+                // Debug check for audio components
+                if (audioSource == null)
+                {
+                    UnityEngine.Debug.LogError("AudioSource is null!");
+                    return;
+                }
+                if (whatCanIDoSound == null)
+                {
+                    UnityEngine.Debug.LogError("whatCanIDoSound clip is not assigned!");
+                    return;
+                }
 
-                UnityEngine.Debug.Log("Starting Rhino processing...");
-                rhinoManager.Process();
-                isListening = true;
-                
-                UnityEngine.Debug.Log("Listening for voice commands...");
-                string message = "Honey, what can I do for you?";
-                DisplayOutputText(message);
+                StartCoroutine(StartListeningAfterSound());
             }
             catch (System.Exception ex)
             {
                 UnityEngine.Debug.LogError($"Failed to start listening: {ex.Message}");
-                
-                // Try to reinitialize Rhino if there's an error
                 InitializeRhino();
-                
                 DisplayOutputText("Failed to start voice recognition");
+            }
+        }
+
+        private IEnumerator StartListeningAfterSound()
+        {
+            // Set initial UI state
+            isListening = true; // Set this early so the VAD indicator shows green
+            string message = "Honey, what can I do for you?";
+            DisplayOutputText(message);
+            
+            PlaySound(whatCanIDoSound);
+            
+            // Wait for the sound to finish playing plus a small buffer
+            if (whatCanIDoSound != null)
+            {
+                yield return new WaitForSeconds(whatCanIDoSound.length + 0.2f);
+            }
+
+            // Initialize Rhino if needed
+            if (rhinoManager == null)
+            {
+                InitializeRhino();
+            }
+
+            UnityEngine.Debug.Log("Starting Rhino processing...");
+            if (rhinoManager != null)
+            {
+                try
+                {
+                    rhinoManager.Process();
+                    lastAudioCheckTime = Time.time;
+                    UnityEngine.Debug.Log("Listening for voice commands...");
+                }
+                catch (System.Exception ex)
+                {
+                    UnityEngine.Debug.LogError($"Failed to start processing: {ex.Message}");
+                    // Try to recover
+                    InitializeRhino();
+                    if (rhinoManager != null)
+                    {
+                        rhinoManager.Process();
+                        lastAudioCheckTime = Time.time;
+                    }
+                    else
+                    {
+                        isListening = false;
+                        DisplayOutputText("Failed to start voice recognition. Please try again.");
+                    }
+                }
+            }
+            else
+            {
+                isListening = false;
+                DisplayOutputText("Voice recognition not initialized. Please try again.");
             }
         }
 
@@ -313,16 +388,24 @@ namespace HoneyOS.VoiceControl
         {
             try
             {
-                audioSource.clip = stopRecordingSound;
-                audioSource.Play();
+                // Debug check for audio components
+                if (audioSource == null)
+                {
+                    UnityEngine.Debug.LogError("AudioSource is null!");
+                    return;
+                }
+                if (stopRecordingSound == null)
+                {
+                    UnityEngine.Debug.LogError("stopRecordingSound clip is not assigned!");
+                    return;
+                }
+
+                PlaySound(stopRecordingSound);
 
                 isListening = false;
 
                 if (isButtonUsed)
                     isButtonUsed = false;
-                    
-                // Don't reset Rhino when manually stopped - it should be reusable
-                // ResetRhinoForNextCommand();
             }
             catch (System.Exception ex)
             {
@@ -332,27 +415,62 @@ namespace HoneyOS.VoiceControl
 
         private void OnInferenceResult(Inference inference)
         {
-            isListening = false;
             commandCount++;
             
             UnityEngine.Debug.Log($"Command #{commandCount} - Intent understood: {inference.IsUnderstood}");
             
             if (inference.IsUnderstood)
             {
+                isListening = false;
                 string intent = inference.Intent;
                 Dictionary<string, string> slots = inference.Slots;
                 
                 UnityEngine.Debug.Log($"Executing intent: {intent}");
                 ExecuteIntent(intent, slots);
+                
+                // Reset Rhino for next command
+                StartCoroutine(DelayedRhinoReset());
             }
             else
             {
                 UnityEngine.Debug.Log("Intent not understood");
-                DisplayOutputText("Sorry, I didn't understand that command.");
+                DisplayOutputText("Sorry, I didn't understand that command. Please try again.");
+                
+                // Reset and restart Rhino for continuous listening
+                StartCoroutine(ContinueListening());
             }
+        }
+
+        private IEnumerator ContinueListening()
+        {
+            // Small delay to ensure clean state
+            yield return new WaitForSeconds(0.1f);
             
-            // Reset Rhino for next command with minimal delay to allow animations to start
-            StartCoroutine(DelayedRhinoReset());
+            try
+            {
+                // Clean up current instance
+                if (rhinoManager != null)
+                {
+                    rhinoManager.Delete();
+                    rhinoManager = null;
+                }
+                
+                // Reinitialize Rhino
+                InitializeRhino();
+                
+                // Start processing again
+                if (rhinoManager != null)
+                {
+                    rhinoManager.Process();
+                    lastAudioCheckTime = Time.time; // Reset the timer when continuing to listen
+                }
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Failed to continue listening: {ex.Message}");
+                isListening = false;
+                DisplayOutputText("Voice recognition error. Please try again.");
+            }
         }
 
         private void ExecuteIntent(string intent, Dictionary<string, string> slots)
@@ -583,6 +701,116 @@ namespace HoneyOS.VoiceControl
             if (rhinoManager != null)
             {
                 rhinoManager.Delete();
+            }
+        }
+
+        private void ConfigureAudioSource()
+        {
+            if (audioSource != null)
+            {
+                audioSource.playOnAwake = false;
+                audioSource.spatialBlend = 0f; // Make it 2D audio
+                audioSource.volume = 1f;
+                audioSource.mute = false;
+                audioSource.loop = false;
+            }
+        }
+
+        private void PlaySound(AudioClip clip)
+        {
+            if (audioSource != null && clip != null)
+            {
+                ConfigureAudioSource(); // Ensure settings are correct before playing
+                audioSource.clip = clip;
+                audioSource.Play();
+            }
+        }
+
+        private void MonitorAudioCapture()
+        {
+            if (!isListening) return;
+
+            if (Time.time - lastAudioCheckTime >= audioCheckInterval)
+            {
+                lastAudioCheckTime = Time.time;
+                
+                // Check if microphone is still working properly
+                if (microphoneManager != null && microphoneManager.IsRecording)
+                {
+                    bool needsReset = false;
+
+                    // Check if we're stuck in a non-responsive state
+                    if (Time.time - lastAudioCheckTime >= noAudioTimeout)
+                    {
+                        UnityEngine.Debug.Log("Audio capture may be stuck, attempting reset...");
+                        needsReset = true;
+                    }
+
+                    if (needsReset)
+                    {
+                        RestartAudioCapture();
+                    }
+                }
+            }
+        }
+
+        private void RestartAudioCapture()
+        {
+            try
+            {
+                UnityEngine.Debug.Log("Restarting audio capture...");
+                
+                // Stop current capture
+                if (microphoneManager != null)
+                {
+                    // The microphone manager will be recreated, no need to explicitly stop
+                    microphoneManager = null;
+                }
+                
+                // Reset Rhino
+                if (rhinoManager != null)
+                {
+                    rhinoManager.Delete();
+                    rhinoManager = null;
+                }
+
+                // Small delay to ensure clean state
+                StartCoroutine(DelayedAudioRestart());
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Failed to restart audio capture: {ex.Message}");
+                isListening = false;
+                DisplayOutputText("Audio capture error. Please try again.");
+            }
+        }
+
+        private IEnumerator DelayedAudioRestart()
+        {
+            yield return new WaitForSeconds(0.5f);
+            
+            try
+            {
+                // Reinitialize components
+                if (microphoneManager == null)
+                {
+                    microphoneManager = gameObject.AddComponent<PicovoiceMicrophoneManager>();
+                }
+                
+                InitializeRhino();
+                
+                if (rhinoManager != null)
+                {
+                    rhinoManager.Process();
+                    DisplayOutputText("Audio capture restarted. Please continue speaking.");
+                    lastAudioCheckTime = Time.time; // Reset the timer
+                }
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Failed to reinitialize audio capture: {ex.Message}");
+                isListening = false;
+                DisplayOutputText("Failed to restart audio. Please try again.");
             }
         }
     }
