@@ -17,7 +17,7 @@ namespace HoneyOS.VoiceControl
     public class MicrophoneDemo : MonoBehaviour
     {
         [Header("Picovoice Settings")]
-        public string accessKey = "tFwk5W4ttKaMr2u4kSVxR+APT/2pBveVDmVCzKKIY2CyYieVgXthdg=="; // Replace with your Picovoice access key
+        public string accessKey = "s73gVRPzWz+CRgZoOyYPeHR9F+2Q/tyQmMb02L57uIBzfqk0wMw9Kg===="; // Replace with your fresh Picovoice access key
         public string contextPath = "honeyos_context.rhn"; // Path to your custom context file
         public bool autoRestartListening = false; // Automatically restart listening after each command
         public float restartDelay = 1.0f; // Delay before restarting (in seconds)
@@ -47,6 +47,7 @@ namespace HoneyOS.VoiceControl
 
         [Header("Intent Actions")]
         private Dictionary<string, (Action function, string message)> intentActionDictionary;
+        private string lastActionMessage = "";
 
         [Header("Voice Activity Detection (VAD)")]
         public Image vadIndicatorImage;
@@ -97,6 +98,9 @@ namespace HoneyOS.VoiceControl
                 microphoneManager = gameObject.AddComponent<PicovoiceMicrophoneManager>();
             }
 
+            // Check microphone availability
+            CheckMicrophoneAvailability();
+            
             InitializeRhino();
             InitIntentActionDictionary();
             
@@ -115,61 +119,156 @@ namespace HoneyOS.VoiceControl
                     rhinoManager = null;
                 }
                 
-                // Build the full path to the context file
-                string fullContextPath;
+                // Build the full path to the context file with detailed logging
                 string platform = GetPlatform();
+                string platformContextFileName = GetContextFileName();
                 
-                #if UNITY_EDITOR
-                    fullContextPath = System.IO.Path.Combine(Application.streamingAssetsPath, $"contexts/{platform}/{GetContextFileName()}");
+                UnityEngine.Debug.Log($"=== CONTEXT FILE PATH ANALYSIS ===");
+                UnityEngine.Debug.Log($"Platform detected: {platform}");
+                UnityEngine.Debug.Log($"Platform context filename: {platformContextFileName}");
+                UnityEngine.Debug.Log($"StreamingAssets path: {Application.streamingAssetsPath}");
+                UnityEngine.Debug.Log($"Main context path setting: {contextPath}");
+                
+                // Try multiple path strategies
+                string fullContextPath = null;
+                List<string> pathsToTry = new List<string>();
+                
+                #if UNITY_EDITOR || UNITY_STANDALONE
+                    // Strategy 1: Platform-specific context file
+                    string platformSpecificPath = System.IO.Path.Combine(Application.streamingAssetsPath, "contexts", platform, platformContextFileName);
+                    pathsToTry.Add(platformSpecificPath);
+                    
+                    // Strategy 2: Main context file in StreamingAssets root
+                    string mainContextPath = System.IO.Path.Combine(Application.streamingAssetsPath, contextPath);
+                    pathsToTry.Add(mainContextPath);
+                    
+                    // Strategy 3: Direct honeyos_context.rhn in StreamingAssets
+                    string directContextPath = System.IO.Path.Combine(Application.streamingAssetsPath, "honeyos_context.rhn");
+                    pathsToTry.Add(directContextPath);
                 #elif UNITY_ANDROID
-                    fullContextPath = contextPath; // On Android, use relative path
+                    // On Android, use relative paths
+                    pathsToTry.Add($"contexts/{platform}/{platformContextFileName}");
+                    pathsToTry.Add(contextPath);
+                    pathsToTry.Add("honeyos_context.rhn");
                 #else
-                    fullContextPath = System.IO.Path.Combine(Application.streamingAssetsPath, $"contexts/{platform}/{GetContextFileName()}");
+                    // Other platforms
+                    string platformSpecificPath = System.IO.Path.Combine(Application.streamingAssetsPath, "contexts", platform, platformContextFileName);
+                    pathsToTry.Add(platformSpecificPath);
+                    string mainContextPath = System.IO.Path.Combine(Application.streamingAssetsPath, contextPath);
+                    pathsToTry.Add(mainContextPath);
                 #endif
                 
-                UnityEngine.Debug.Log($"Initializing Rhino - Platform: {platform}");
-                UnityEngine.Debug.Log($"Initializing Rhino - Context path: {fullContextPath}");
+                // Test each path and use the first one that exists
+                for (int i = 0; i < pathsToTry.Count; i++)
+                {
+                    string testPath = pathsToTry[i];
+                    UnityEngine.Debug.Log($"Testing path {i + 1}: {testPath}");
+                    UnityEngine.Debug.Log($"Path exists: {System.IO.File.Exists(testPath)}");
+                    
+                    if (System.IO.File.Exists(testPath))
+                    {
+                        fullContextPath = testPath;
+                        UnityEngine.Debug.Log($"✓ FOUND CONTEXT FILE: {fullContextPath}");
+                        break;
+                    }
+                }
+                
+                // If no context file found, show detailed error
+                if (string.IsNullOrEmpty(fullContextPath))
+                {
+                    UnityEngine.Debug.LogError("❌ NO CONTEXT FILE FOUND!");
+                    UnityEngine.Debug.LogError("Searched paths:");
+                    for (int i = 0; i < pathsToTry.Count; i++)
+                    {
+                        UnityEngine.Debug.LogError($"  {i + 1}. {pathsToTry[i]}");
+                    }
+                    
+                    // List what files ARE in StreamingAssets
+                    try
+                    {
+                        string[] files = System.IO.Directory.GetFiles(Application.streamingAssetsPath, "*.rhn", System.IO.SearchOption.AllDirectories);
+                        UnityEngine.Debug.LogError("Available .rhn files in StreamingAssets:");
+                        foreach (string file in files)
+                        {
+                            UnityEngine.Debug.LogError($"  - {file}");
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        UnityEngine.Debug.LogError($"Error listing files: {ex.Message}");
+                    }
+                    
+                    DisplayOutputText("Context file not found");
+                    return;
+                }
+                
                 UnityEngine.Debug.Log($"Access key length: {accessKey.Length}");
                 UnityEngine.Debug.Log($"Unity Platform: {Application.platform}");
                 
-                if (accessKey == "YOUR_ACCESS_KEY_HERE")
+                if (accessKey == "YOUR_NEW_ACCESS_KEY_HERE" || accessKey == "PASTE_YOUR_FRESH_ACCESS_KEY_HERE" || string.IsNullOrEmpty(accessKey))
                 {
                     UnityEngine.Debug.LogError("Access key not set! Please set your Picovoice access key.");
                     DisplayOutputText("Access key not configured");
                     return;
                 }
                 
-                // Verify context file exists, with fallback to main context file
-                if (!System.IO.File.Exists(fullContextPath))
+                // Validate access key format (should be base64-like)
+                if (accessKey.Length < 20)
                 {
-                    UnityEngine.Debug.LogWarning($"Platform-specific context file not found at: {fullContextPath}");
-                    // Fallback to main context file
-                    fullContextPath = System.IO.Path.Combine(Application.streamingAssetsPath, contextPath);
-                    
-                    if (!System.IO.File.Exists(fullContextPath))
-                    {
-                        UnityEngine.Debug.LogError($"Context file not found at: {fullContextPath}");
-                        DisplayOutputText("Context file not found");
-                        return;
-                    }
-                    else
-                    {
-                        UnityEngine.Debug.Log($"Using fallback context file: {fullContextPath}");
-                    }
+                    UnityEngine.Debug.LogError($"Access key appears to be too short: {accessKey.Length} characters");
+                    DisplayOutputText("Invalid access key format");
+                    return;
                 }
+                
+                // Check if model file exists
+                string modelPath = System.IO.Path.Combine(Application.streamingAssetsPath, "rhino_params.pv");
+                UnityEngine.Debug.Log($"Model path: {modelPath}");
+                UnityEngine.Debug.Log($"Model file exists: {System.IO.File.Exists(modelPath)}");
+                
+                UnityEngine.Debug.Log("About to create RhinoManager...");
+                UnityEngine.Debug.Log($"Final access key (first 10 chars): {accessKey.Substring(0, Math.Min(10, accessKey.Length))}...");
+                UnityEngine.Debug.Log($"Final context path: {fullContextPath}");
                 
                 rhinoManager = RhinoManager.Create(
                     accessKey,
                     fullContextPath,
                     OnInferenceResult);
                 
-                UnityEngine.Debug.Log("Rhino Speech-to-Intent initialized successfully");
+                UnityEngine.Debug.Log("✓ Rhino Speech-to-Intent initialized successfully");
             }
             catch (System.Exception ex)
             {
                 UnityEngine.Debug.LogError($"Failed to initialize Rhino: {ex.Message}");
                 UnityEngine.Debug.LogError($"Stack trace: {ex.StackTrace}");
                 DisplayOutputText("Voice recognition initialization failed");
+            }
+        }
+
+        private void IncreaseFrameCount()
+        {
+            if (algorithmManager.frameCountSlider.value < 7)
+            {
+                algorithmManager.UpdateFrameCount(algorithmManager.frameCountSlider.value + 1);
+                algorithmManager.frameCountSlider.value += 1;
+                lastActionMessage = $"Increased frame count to {algorithmManager.frameCountSlider.value}";
+            }
+            else
+            {
+                lastActionMessage = "Frame count is already at maximum (7)";
+            }
+        }
+
+        private void DecreaseFrameCount()
+        {
+            if (algorithmManager.frameCountSlider.value > 1)
+            {
+                algorithmManager.UpdateFrameCount(algorithmManager.frameCountSlider.value - 1);
+                algorithmManager.frameCountSlider.value -= 1;
+                lastActionMessage = $"Decreased frame count to {algorithmManager.frameCountSlider.value}";
+            }
+            else
+            {
+                lastActionMessage = "Frame count is already at minimum (1)";
             }
         }
 
@@ -222,6 +321,17 @@ namespace HoneyOS.VoiceControl
                         throw; // Rethrow to be handled by ExecuteIntent
                     }
                 }, "Opening File") },
+
+                { "newFile", ( () => {
+                    try {
+                        textEditor.NewFile();
+                    }
+                    catch (System.Exception ex) {
+                        UnityEngine.Debug.LogError($"Error creating new file: {ex.Message}");
+                        throw; // Rethrow to be handled by ExecuteIntent
+                    }
+                }, "Creating New File") },
+                
                 
                 // Text Editing
                 { "undo", ( () => textEditor.Undo(), "Undo text changes") },
@@ -269,21 +379,69 @@ namespace HoneyOS.VoiceControl
 
                 //Page Algorithms
                 { "homeBlueberry", ( () => pageReplacementNav.OpenHome(), "Going back to Blueberry Ville") },
+                { "home blueberry", ( () => pageReplacementNav.OpenHome(), "Going back to Blueberry Ville") },
                 { "startBlueberry", ( () => pageReplacementNav.OpenSelectionPage(), "Opening Algorithm selector") },
+                { "start blueberry", ( () => pageReplacementNav.OpenSelectionPage(), "Opening Algorithm selector") },
                 { "backToAlgorithmSelection", ( () => {pageReplacementNav.OpenSelectionPage(); algorithmManager.Reset();}, "Opening Algorithm selector") },
+                { "back to algorithm selection", ( () => {pageReplacementNav.OpenSelectionPage(); algorithmManager.Reset();}, "Opening Algorithm selector") },
+                
+                // FIFO Algorithm
                 { "chooseFIFO", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
+                { "choose FIFO", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
+                { "choose fifo", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
+                { "select FIFO", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
+                { "select fifo", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
+                { "first in first out", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
+                
+                // OPR Algorithm
                 { "chooseOPR", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
+                { "choose OPR", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
+                { "choose opr", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
+                { "select OPR", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
+                { "select opr", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
+                { "choose optimal", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
+                { "optimal page replacement", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
+                
+                // LRU Algorithm
                 { "chooseLRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
+                { "choose LRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
+                { "choose lru", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
+                { "select LRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
+                { "select lru", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
+                { "least recently used", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
+                
+                // MRU Algorithm
                 { "chooseMRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
+                { "choose MRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
+                { "choose mru", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
+                { "select MRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
+                { "select mru", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
+                { "most recently used", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
+                
+                // LFU Algorithm
                 { "chooseLFU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
+                { "choose LFU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
+                { "choose lfu", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
+                { "select LFU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
+                { "select lfu", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
+                { "least frequently used", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
+                
+                // Algorithm Control
                 { "simulateAlgorithm", ( () => { algorithmManager.ProcessReferenceString();  algorithmManager.RunSelectedAlgorithm();}, "Starting simulation") },
+                { "simulate algorithm", ( () => { algorithmManager.ProcessReferenceString();  algorithmManager.RunSelectedAlgorithm();}, "Starting simulation") },
+                { "start algorithm", ( () => { algorithmManager.ProcessReferenceString();  algorithmManager.RunSelectedAlgorithm();}, "Starting simulation") },
+                { "run algorithm", ( () => { algorithmManager.ProcessReferenceString();  algorithmManager.RunSelectedAlgorithm();}, "Starting simulation") },
                 { "pauseAlgorithm", ( () => { algorithmManager.TogglePause();}, "Pausing simulation") },
+                { "pause algorithm", ( () => { algorithmManager.TogglePause();}, "Pausing simulation") },
                 { "resumeAlgorithm", ( () => { algorithmManager.TogglePause();}, "Resuming simulation") },
+                { "resume algorithm", ( () => { algorithmManager.TogglePause();}, "Resuming simulation") },
                 { "resetAlgorithm", ( () => { algorithmManager.Reset();}, "Stopping simulation") },
+                { "reset algorithm", ( () => { algorithmManager.Reset();}, "Stopping simulation") },
+                { "stop algorithm", ( () => { algorithmManager.Reset();}, "Stopping simulation") },
 
                 //Frame Count
-                { "increaseFrames", ( () => { algorithmManager.UpdateFrameCount(algorithmManager.frameCountSlider.value + 1); algorithmManager.frameCountSlider.value += 1; }, "Increasing frame count") },
-                { "decreaseFrames", ( () => { algorithmManager.UpdateFrameCount(algorithmManager.frameCountSlider.value - 1); algorithmManager.frameCountSlider.value -= 1; }, "Decreasing frame count") },
+                { "increaseFrames", ( () => IncreaseFrameCount(), "DYNAMIC_MESSAGE") },
+                { "decreaseFrames", ( () => DecreaseFrameCount(), "DYNAMIC_MESSAGE") },
                 { "setFrameCount1", ( () => { algorithmManager.UpdateFrameCount(1); algorithmManager.frameCountSlider.value = 1; }, "Setting frame count to 1") },
                 { "setFrameCount2", ( () => { algorithmManager.UpdateFrameCount(2); algorithmManager.frameCountSlider.value = 2; }, "Setting frame count to 2") },
                 { "setFrameCount3", ( () => { algorithmManager.UpdateFrameCount(3); algorithmManager.frameCountSlider.value = 3; }, "Setting frame count to 3") },
@@ -561,14 +719,35 @@ namespace HoneyOS.VoiceControl
         {
             try
             {
+                // Debug logging for page replacement commands
+                if (intent.ToLower().Contains("fifo") || intent.ToLower().Contains("lru") || 
+                    intent.ToLower().Contains("opr") || intent.ToLower().Contains("mru") || 
+                    intent.ToLower().Contains("lfu") || intent.ToLower().Contains("algorithm"))
+                {
+                    UnityEngine.Debug.Log($"🔍 PAGE REPLACEMENT COMMAND DETECTED: '{intent}'");
+                    UnityEngine.Debug.Log($"Available page replacement commands:");
+                    foreach (var kvp in intentActionDictionary)
+                    {
+                        if (kvp.Key.ToLower().Contains("fifo") || kvp.Key.ToLower().Contains("lru") || 
+                            kvp.Key.ToLower().Contains("opr") || kvp.Key.ToLower().Contains("mru") || 
+                            kvp.Key.ToLower().Contains("lfu") || kvp.Key.ToLower().Contains("algorithm") ||
+                            kvp.Key.ToLower().Contains("blueberry"))
+                        {
+                            UnityEngine.Debug.Log($"  - '{kvp.Key}' -> {kvp.Value.message}");
+                        }
+                    }
+                }
+                
                 // First try exact match
                 if (intentActionDictionary.ContainsKey(intent))
                 {
                     var action = intentActionDictionary[intent];
+                    UnityEngine.Debug.Log($"✅ EXACT MATCH FOUND: '{intent}' -> {action.message}");
                     try
                     {
                         action.function();
-                        DisplayOutputText(action.message);
+                        string messageToDisplay = action.message == "DYNAMIC_MESSAGE" ? lastActionMessage : action.message;
+                        DisplayOutputText(messageToDisplay);
                     }
                     catch (System.Exception ex)
                     {
@@ -597,7 +776,8 @@ namespace HoneyOS.VoiceControl
                         try
                         {
                             kvp.Value.function();
-                            DisplayOutputText(kvp.Value.message);
+                            string messageToDisplay = kvp.Value.message == "DYNAMIC_MESSAGE" ? lastActionMessage : kvp.Value.message;
+                            DisplayOutputText(messageToDisplay);
                         }
                         catch (System.Exception ex)
                         {
@@ -614,7 +794,8 @@ namespace HoneyOS.VoiceControl
                         try
                         {
                             kvp.Value.function();
-                            DisplayOutputText(kvp.Value.message);
+                            string messageToDisplay = kvp.Value.message == "DYNAMIC_MESSAGE" ? lastActionMessage : kvp.Value.message;
+                            DisplayOutputText(messageToDisplay);
                         }
                         catch (System.Exception ex)
                         {
@@ -627,7 +808,18 @@ namespace HoneyOS.VoiceControl
                 }
                 
                 // If still no match, log for debugging
-                UnityEngine.Debug.LogWarning($"No match found for intent: '{intent}'");
+                UnityEngine.Debug.LogWarning($"❌ NO MATCH FOUND for intent: '{intent}'");
+                UnityEngine.Debug.LogWarning($"Available commands (first 10):");
+                int count = 0;
+                foreach (var kvp in intentActionDictionary)
+                {
+                    if (count < 10)
+                    {
+                        UnityEngine.Debug.LogWarning($"  - '{kvp.Key}'");
+                        count++;
+                    }
+                }
+                UnityEngine.Debug.LogWarning($"... and {intentActionDictionary.Count - 10} more commands");
                 DisplayOutputText("Command not recognized.");
             }
             catch (System.Exception ex)
@@ -1049,6 +1241,444 @@ namespace HoneyOS.VoiceControl
             {
                 UnityEngine.Debug.LogError($"Failed to start processing after recovery: {ex.Message}");
             }
+        }
+
+        private void CheckMicrophoneAvailability()
+        {
+            try
+            {
+                UnityEngine.Debug.Log($"Available microphone devices: {Microphone.devices.Length}");
+                for (int i = 0; i < Microphone.devices.Length; i++)
+                {
+                    UnityEngine.Debug.Log($"Microphone {i}: {Microphone.devices[i]}");
+                }
+                
+                if (Microphone.devices.Length == 0)
+                {
+                    UnityEngine.Debug.LogError("No microphone devices found!");
+                    DisplayOutputText("No microphone found");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Error checking microphone availability: {ex.Message}");
+            }
+        }
+
+        // Call this method from Unity Inspector or another script to test basic setup
+        [ContextMenu("Test Rhino Setup")]
+        public void TestRhinoSetup()
+        {
+            TestRhinoSetupInternal(true);
+        }
+        
+        // File-only test that works in Edit mode
+        [ContextMenu("Test Files Only (Edit Mode Safe)")]
+        public void TestFilesOnly()
+        {
+            TestRhinoSetupInternal(false);
+        }
+        
+        // Add this new comprehensive diagnostic method
+        [ContextMenu("Diagnose Voice Initialization")]
+        public void DiagnoseVoiceInitialization()
+        {
+            UnityEngine.Debug.Log("=== VOICE INITIALIZATION DIAGNOSTIC ===");
+            
+            // Step 1: Check access key
+            bool accessKeyValid = !string.IsNullOrEmpty(accessKey) && 
+                                 accessKey != "YOUR_NEW_ACCESS_KEY_HERE" && 
+                                 accessKey != "PASTE_YOUR_FRESH_ACCESS_KEY_HERE" &&
+                                 accessKey.Length > 20;
+            
+            UnityEngine.Debug.Log($"🔑 ACCESS KEY STATUS:");
+            UnityEngine.Debug.Log($"   Set: {!string.IsNullOrEmpty(accessKey)}");
+            UnityEngine.Debug.Log($"   Not placeholder: {accessKey != "YOUR_NEW_ACCESS_KEY_HERE"}");
+            UnityEngine.Debug.Log($"   Length: {accessKey?.Length ?? 0} characters");
+            UnityEngine.Debug.Log($"   Valid format: {accessKeyValid}");
+            
+            if (!accessKeyValid)
+            {
+                UnityEngine.Debug.LogError("❌ ACCESS KEY ISSUE DETECTED!");
+                UnityEngine.Debug.LogError("🔧 SOLUTION: Get a fresh access key from https://console.picovoice.ai/");
+                UnityEngine.Debug.LogError("   1. Sign up/login to Picovoice Console");
+                UnityEngine.Debug.LogError("   2. Copy your AccessKey");
+                UnityEngine.Debug.LogError("   3. Replace 'YOUR_NEW_ACCESS_KEY_HERE' in the script");
+                return;
+            }
+            
+            // Step 2: Check files
+            string platform = GetPlatform();
+            string platformContextFileName = GetContextFileName();
+            
+            UnityEngine.Debug.Log($"📁 FILE STATUS:");
+            UnityEngine.Debug.Log($"   Platform: {platform}");
+            UnityEngine.Debug.Log($"   StreamingAssets path: {Application.streamingAssetsPath}");
+            
+            // Check context files
+            List<string> contextPaths = new List<string>
+            {
+                System.IO.Path.Combine(Application.streamingAssetsPath, "contexts", platform, platformContextFileName),
+                System.IO.Path.Combine(Application.streamingAssetsPath, contextPath),
+                System.IO.Path.Combine(Application.streamingAssetsPath, "honeyos_context.rhn")
+            };
+            
+            string workingContextPath = null;
+            foreach (string path in contextPaths)
+            {
+                bool exists = System.IO.File.Exists(path);
+                UnityEngine.Debug.Log($"   Context file: {path} - {(exists ? "✅ Found" : "❌ Missing")}");
+                if (exists && workingContextPath == null)
+                {
+                    workingContextPath = path;
+                }
+            }
+            
+            // Check model file
+            string modelPath = System.IO.Path.Combine(Application.streamingAssetsPath, "rhino_params.pv");
+            bool modelExists = System.IO.File.Exists(modelPath);
+            UnityEngine.Debug.Log($"   Model file: {modelPath} - {(modelExists ? "✅ Found" : "❌ Missing")}");
+            
+            if (workingContextPath == null || !modelExists)
+            {
+                UnityEngine.Debug.LogError("❌ MISSING FILES DETECTED!");
+                UnityEngine.Debug.LogError("🔧 SOLUTION: Ensure these files are in Assets/StreamingAssets/:");
+                UnityEngine.Debug.LogError("   - rhino_params.pv");
+                UnityEngine.Debug.LogError("   - honeyos_context.rhn (or platform-specific version)");
+                return;
+            }
+            
+            // Step 3: Check microphone
+            UnityEngine.Debug.Log($"🎤 MICROPHONE STATUS:");
+            try
+            {
+                int micCount = Microphone.devices.Length;
+                UnityEngine.Debug.Log($"   Available devices: {micCount}");
+                for (int i = 0; i < micCount; i++)
+                {
+                    UnityEngine.Debug.Log($"   Device {i}: {Microphone.devices[i]}");
+                }
+                
+                if (micCount == 0)
+                {
+                    UnityEngine.Debug.LogError("❌ NO MICROPHONE DETECTED!");
+                    UnityEngine.Debug.LogError("🔧 SOLUTION: Connect a microphone and restart Unity");
+                    return;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"❌ MICROPHONE ERROR: {ex.Message}");
+                return;
+            }
+            
+            // Step 4: Test Rhino creation (only in Play mode)
+            #if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                UnityEngine.Debug.Log("⚠️ RHINO TEST: Requires Play mode");
+                UnityEngine.Debug.Log("✅ PRE-FLIGHT CHECK COMPLETE!");
+                UnityEngine.Debug.Log("💡 NEXT STEP: Enter Play mode and test voice commands");
+                return;
+            }
+            #endif
+            
+            UnityEngine.Debug.Log($"🧪 TESTING RHINO CREATION:");
+            try
+            {
+                var testRhino = RhinoManager.Create(accessKey, workingContextPath, (inference) => {
+                    UnityEngine.Debug.Log("Test inference received");
+                });
+                UnityEngine.Debug.Log("✅ RHINO CREATION: SUCCESS!");
+                testRhino.Delete();
+                
+                UnityEngine.Debug.Log("🎉 VOICE INITIALIZATION SHOULD WORK!");
+                UnityEngine.Debug.Log("💡 Try pressing the voice button or holding spacebar");
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"❌ RHINO CREATION FAILED: {ex.Message}");
+                
+                // Provide specific error solutions
+                if (ex.Message.Contains("00000136"))
+                {
+                    UnityEngine.Debug.LogError("🔧 ERROR 00000136 = Invalid Access Key");
+                    UnityEngine.Debug.LogError("   Get a fresh key from https://console.picovoice.ai/");
+                }
+                else if (ex.Message.Contains("00000137"))
+                {
+                    UnityEngine.Debug.LogError("🔧 ERROR 00000137 = Access Key Expired");
+                    UnityEngine.Debug.LogError("   Get a fresh key from https://console.picovoice.ai/");
+                }
+                else if (ex.Message.Contains("file") || ex.Message.Contains("path"))
+                {
+                    UnityEngine.Debug.LogError("🔧 FILE PATH ERROR");
+                    UnityEngine.Debug.LogError("   Check that context and model files are in StreamingAssets");
+                }
+                else
+                {
+                    UnityEngine.Debug.LogError("🔧 UNKNOWN ERROR - Check Picovoice documentation");
+                }
+            }
+            
+            UnityEngine.Debug.Log("=== END DIAGNOSTIC ===");
+        }
+        
+        // Add this new diagnostic method specifically for Blueberry commands
+        [ContextMenu("Diagnose Blueberry Commands")]
+        public void DiagnoseBlueberryCommands()
+        {
+            UnityEngine.Debug.Log("=== BLUEBERRY COMMANDS DIAGNOSTIC ===");
+            
+            // Step 1: Check component references
+            UnityEngine.Debug.Log("🔧 COMPONENT REFERENCES:");
+            UnityEngine.Debug.Log($"   pageReplacementNav: {(pageReplacementNav != null ? "✅ Found" : "❌ Missing")}");
+            UnityEngine.Debug.Log($"   algorithmManager: {(algorithmManager != null ? "✅ Found" : "❌ Missing")}");
+            
+            if (pageReplacementNav == null)
+            {
+                UnityEngine.Debug.LogError("❌ pageReplacementNav is null! Assign PageController3 component in Inspector.");
+            }
+            
+            if (algorithmManager == null)
+            {
+                UnityEngine.Debug.LogError("❌ algorithmManager is null! Assign AlgorithmManager component in Inspector.");
+            }
+            
+            // Step 2: Test component methods (only if components exist)
+            if (pageReplacementNav != null)
+            {
+                UnityEngine.Debug.Log("🧪 TESTING PageController3 methods:");
+                try
+                {
+                    UnityEngine.Debug.Log("   Testing OpenHome()...");
+                    pageReplacementNav.OpenHome();
+                    UnityEngine.Debug.Log("   ✅ OpenHome() works");
+                    
+                    UnityEngine.Debug.Log("   Testing OpenSelectionPage()...");
+                    pageReplacementNav.OpenSelectionPage();
+                    UnityEngine.Debug.Log("   ✅ OpenSelectionPage() works");
+                    
+                    UnityEngine.Debug.Log("   Testing OpenSimPage()...");
+                    pageReplacementNav.OpenSimPage();
+                    UnityEngine.Debug.Log("   ✅ OpenSimPage() works");
+                }
+                catch (System.Exception ex)
+                {
+                    UnityEngine.Debug.LogError($"   ❌ PageController3 method failed: {ex.Message}");
+                }
+            }
+            
+            if (algorithmManager != null)
+            {
+                UnityEngine.Debug.Log("🧪 TESTING AlgorithmManager methods:");
+                try
+                {
+                    UnityEngine.Debug.Log("   Testing SetAlgorithm('FIFO')...");
+                    algorithmManager.SetAlgorithm("FIFO");
+                    UnityEngine.Debug.Log("   ✅ SetAlgorithm() works");
+                    
+                    UnityEngine.Debug.Log("   Testing Reset()...");
+                    algorithmManager.Reset();
+                    UnityEngine.Debug.Log("   ✅ Reset() works");
+                }
+                catch (System.Exception ex)
+                {
+                    UnityEngine.Debug.LogError($"   ❌ AlgorithmManager method failed: {ex.Message}");
+                }
+            }
+            
+            // Step 3: List all Blueberry commands
+            UnityEngine.Debug.Log("📋 AVAILABLE BLUEBERRY COMMANDS:");
+            var blueberryCommands = new List<string>();
+            foreach (var kvp in intentActionDictionary)
+            {
+                if (kvp.Key.ToLower().Contains("blueberry") || 
+                    kvp.Key.ToLower().Contains("fifo") || 
+                    kvp.Key.ToLower().Contains("lru") || 
+                    kvp.Key.ToLower().Contains("opr") || 
+                    kvp.Key.ToLower().Contains("mru") || 
+                    kvp.Key.ToLower().Contains("lfu") || 
+                    kvp.Key.ToLower().Contains("algorithm") ||
+                    kvp.Key.ToLower().Contains("frame"))
+                {
+                    blueberryCommands.Add(kvp.Key);
+                    UnityEngine.Debug.Log($"   '{kvp.Key}' -> {kvp.Value.message}");
+                }
+            }
+            
+            UnityEngine.Debug.Log($"📊 TOTAL BLUEBERRY COMMANDS: {blueberryCommands.Count}");
+            
+            // Step 4: Test a sample command execution
+            if (pageReplacementNav != null && algorithmManager != null)
+            {
+                UnityEngine.Debug.Log("🧪 TESTING SAMPLE COMMAND EXECUTION:");
+                try
+                {
+                    UnityEngine.Debug.Log("   Executing: chooseFIFO command...");
+                    pageReplacementNav.OpenSimPage();
+                    algorithmManager.SetAlgorithm("FIFO");
+                    UnityEngine.Debug.Log("   ✅ Sample command executed successfully!");
+                }
+                catch (System.Exception ex)
+                {
+                    UnityEngine.Debug.LogError($"   ❌ Sample command failed: {ex.Message}");
+                }
+            }
+            
+            // Step 5: Voice recognition status
+            UnityEngine.Debug.Log("🎤 VOICE RECOGNITION STATUS:");
+            UnityEngine.Debug.Log($"   Rhino initialized: {(rhinoManager != null ? "✅ Yes" : "❌ No")}");
+            UnityEngine.Debug.Log($"   Currently listening: {(isListening ? "✅ Yes" : "❌ No")}");
+            
+            // Step 6: Recommendations
+            UnityEngine.Debug.Log("💡 TROUBLESHOOTING RECOMMENDATIONS:");
+            if (pageReplacementNav == null || algorithmManager == null)
+            {
+                UnityEngine.Debug.LogError("   1. Check Inspector - assign missing component references");
+            }
+            else
+            {
+                UnityEngine.Debug.Log("   1. ✅ All components are assigned");
+            }
+            
+            UnityEngine.Debug.Log("   2. Try these voice commands:");
+            UnityEngine.Debug.Log("      - 'start blueberry' (opens algorithm selector)");
+            UnityEngine.Debug.Log("      - 'choose FIFO' (selects FIFO algorithm)");
+            UnityEngine.Debug.Log("      - 'choose LRU' (selects LRU algorithm)");
+            UnityEngine.Debug.Log("      - 'simulate algorithm' (runs the algorithm)");
+            
+            UnityEngine.Debug.Log("   3. Make sure you're in the correct scene/app context");
+            UnityEngine.Debug.Log("   4. Check that voice recognition is actively listening");
+            
+            UnityEngine.Debug.Log("=== END BLUEBERRY DIAGNOSTIC ===");
+        }
+        
+        private void TestRhinoSetupInternal(bool testRhinoCreation)
+        {
+            UnityEngine.Debug.Log("=== RHINO SETUP TEST ===");
+            
+            // Test 1: Check access key
+            bool accessKeyValid = !string.IsNullOrEmpty(accessKey) && 
+                                 accessKey != "YOUR_NEW_ACCESS_KEY_HERE" && 
+                                 accessKey != "PASTE_YOUR_FRESH_ACCESS_KEY_HERE";
+            UnityEngine.Debug.Log($"Access Key Set: {accessKeyValid}");
+            UnityEngine.Debug.Log($"Access Key Length: {accessKey?.Length ?? 0}");
+            
+            // Test 2: Check StreamingAssets path
+            UnityEngine.Debug.Log($"StreamingAssets Path: {Application.streamingAssetsPath}");
+            UnityEngine.Debug.Log($"StreamingAssets Exists: {System.IO.Directory.Exists(Application.streamingAssetsPath)}");
+            
+            // Test 3: List ALL .rhn files in StreamingAssets
+            try
+            {
+                string[] allRhnFiles = System.IO.Directory.GetFiles(Application.streamingAssetsPath, "*.rhn", System.IO.SearchOption.AllDirectories);
+                UnityEngine.Debug.Log($"Found {allRhnFiles.Length} .rhn files in StreamingAssets:");
+                foreach (string file in allRhnFiles)
+                {
+                    UnityEngine.Debug.Log($"  - {file}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Error listing .rhn files: {ex.Message}");
+            }
+            
+            // Test 4: Check specific paths that the code will try
+            string platform = GetPlatform();
+            string platformContextFileName = GetContextFileName();
+            
+            List<string> pathsToTest = new List<string>
+            {
+                System.IO.Path.Combine(Application.streamingAssetsPath, "contexts", platform, platformContextFileName),
+                System.IO.Path.Combine(Application.streamingAssetsPath, contextPath),
+                System.IO.Path.Combine(Application.streamingAssetsPath, "honeyos_context.rhn")
+            };
+            
+            UnityEngine.Debug.Log($"Platform: {platform}");
+            UnityEngine.Debug.Log($"Platform context filename: {platformContextFileName}");
+            UnityEngine.Debug.Log("Testing context file paths:");
+            
+            string workingContextPath = null;
+            for (int i = 0; i < pathsToTest.Count; i++)
+            {
+                string testPath = pathsToTest[i];
+                bool exists = System.IO.File.Exists(testPath);
+                UnityEngine.Debug.Log($"  {i + 1}. {testPath} - Exists: {exists}");
+                if (exists && workingContextPath == null)
+                {
+                    workingContextPath = testPath;
+                }
+            }
+            
+            // Test 5: Check model file
+            string modelFile = System.IO.Path.Combine(Application.streamingAssetsPath, "rhino_params.pv");
+            UnityEngine.Debug.Log($"Model File: {modelFile} - Exists: {System.IO.File.Exists(modelFile)}");
+            
+            // Test 6: Check microphone
+            CheckMicrophoneAvailability();
+            
+            // Test 7: Try to create Rhino (minimal test) - only if requested and in appropriate mode
+            if (testRhinoCreation && workingContextPath != null && accessKeyValid)
+            {
+                #if UNITY_EDITOR
+                if (!Application.isPlaying)
+                {
+                    UnityEngine.Debug.Log("⚠️ Rhino creation test skipped - requires Play mode in Editor");
+                    UnityEngine.Debug.Log("✅ All file checks passed! Your setup appears correct.");
+                    UnityEngine.Debug.Log("💡 To test voice recognition: Enter Play mode and try speaking commands");
+                }
+                else
+                {
+                #endif
+                    try
+                    {
+                        UnityEngine.Debug.Log($"Testing Rhino creation with: {workingContextPath}");
+                        var testRhino = RhinoManager.Create(accessKey, workingContextPath, (inference) => {
+                            UnityEngine.Debug.Log("Test inference callback triggered");
+                        });
+                        UnityEngine.Debug.Log("✅ Rhino creation test PASSED");
+                        testRhino.Delete();
+                    }
+                    catch (System.Exception ex)
+                    {
+                        UnityEngine.Debug.LogError($"✗ Rhino creation test FAILED: {ex.Message}");
+                        if (ex.Message.Contains("00000136"))
+                        {
+                            UnityEngine.Debug.LogError("Error 00000136 = Invalid Access Key. Please get a fresh access key from https://console.picovoice.ai/");
+                        }
+                    }
+                #if UNITY_EDITOR
+                }
+                #endif
+            }
+            else if (!testRhinoCreation)
+            {
+                if (workingContextPath != null && accessKeyValid)
+                {
+                    UnityEngine.Debug.Log("✅ FILE TEST COMPLETE - All required files found and access key is set!");
+                    UnityEngine.Debug.Log($"✅ Context file: {workingContextPath}");
+                    UnityEngine.Debug.Log("✅ Model file: Found");
+                    UnityEngine.Debug.Log("✅ Access key: Set and valid format");
+                    UnityEngine.Debug.Log("💡 Your voice recognition should work! Try entering Play mode and testing.");
+                }
+                else
+                {
+                    if (workingContextPath == null)
+                        UnityEngine.Debug.LogError("✗ No working context file path found");
+                    if (!accessKeyValid)
+                        UnityEngine.Debug.LogError("✗ Access key not properly set");
+                }
+            }
+            else
+            {
+                if (workingContextPath == null)
+                    UnityEngine.Debug.LogError("✗ No working context file path found");
+                if (!accessKeyValid)
+                    UnityEngine.Debug.LogError("✗ Access key not properly set");
+            }
+            
+            UnityEngine.Debug.Log("=== END RHINO SETUP TEST ===");
         }
     }
 }
