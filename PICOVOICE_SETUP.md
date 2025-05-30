@@ -38,87 +38,152 @@ This guide will help you migrate your HoneyOS Unity application from Whisper spe
 
 ### App Management
 - **Intent**: `openSweet`
-  - Expressions: "open sweet", "launch sweet", "start sweet"
+  - Expressions: "open sweet", "start sweet", "honey start sweet", "honey open sweet"
 - **Intent**: `openSugar`
-  - Expressions: "open sugar", "launch sugar", "start sugar"
+  - Expressions: "open sugar", "start sugar", "honey start sugar", "honey open sugar"
 - **Intent**: `openCake`
-  - Expressions: "open cake", "launch cake", "start cake"
+  - Expressions: "launch cake", "open cake", "start cake", "honey start cake", "honey launch cake", "honey open cake"
+- **Intent**: `openBlueberry`
+  - Expressions: "honey start blueberry", "open blueberry", "honey open blueberry"
 - **Intent**: `closeApp`
-  - Expressions: "close application", "close app", "exit app"
+  - Expressions: "exit app", "close app", "close application"
 - **Intent**: `closeAll`
-  - Expressions: "close all", "close all apps", "exit all"
+  - Expressions: "close applications", "close apps", "close all"
 - **Intent**: `minimizeApp`
-  - Expressions: "minimize application", "minimize app", "minimize"
+  - Expressions: "minimize", "minimize application", "minimize app"
+- **Intent**: `maximizeScreen`
+  - Expressions: "maximize window size"
+- **Intent**: `changeSize`
+  - Expressions: "reset window size", "change window size"
 
 ### File Operations
 - **Intent**: `saveFile`
-  - Expressions: "save file", "save document", "save"
+  - Expressions: "save", "save document", "save file"
 - **Intent**: `saveAsFile`
-  - Expressions: "save as file", "save as", "save file as"
+  - Expressions: "save file as", "save as", "save as file"
 - **Intent**: `openFile`
-  - Expressions: "open file", "open document", "load file"
+  - Expressions: "load file", "open document", "open file"
 - **Intent**: `newFile`
-  - Expressions: "new file", "create file", "new document"
+  - Expressions: "create file", "new document", "new file"
 
 ### Text Editing
 - **Intent**: `undo`
   - Expressions: "undo", "undo changes"
 - **Intent**: `redo`
-  - Expressions: "redo", "redo changes"
+  - Expressions: "redo changes", "redo"
 - **Intent**: `copy`
-  - Expressions: "copy", "copy text"
+  - Expressions: "copy text", "copy"
 - **Intent**: `cut`
-  - Expressions: "cut", "cut text"
+  - Expressions: "cut text", "cut"
 - **Intent**: `paste`
-  - Expressions: "paste", "paste text"
+  - Expressions: "paste text", "paste"
 
 ### Help Navigation
 - **Intent**: `goBack`
-  - Expressions: "go back", "back", "return"
+  - Expressions: "back", "return", "go back"
 - **Intent**: `openSystemBasics`
-  - Expressions: "open system basics", "system basics"
+  - Expressions: "system basics", "open system basics"
 - **Intent**: `openAppGuide`
-  - Expressions: "open application guide", "app guide", "application guide"
+  - Expressions: "open application guide", "application guide", "app guide", "open app guide"
 - **Intent**: `openAboutUs`
-  - Expressions: "open about us", "about us"
+  - Expressions: "open about us", "honey open about us"
 
-### Scheduler Operations
+### Scheduler Operations (Cake)
 - **Intent**: `startCake`
-  - Expressions: "start cake", "begin cake"
+  - Expressions: "begin cake", "play cake"
 - **Intent**: `backToPolicySelection`
-  - Expressions: "back to policy selection", "policy selection"
+  - Expressions: "policy selection", "back to policy selection"
 - **Intent**: `chooseFCFS`
-  - Expressions: "choose first come first serve", "select fcfs", "fcfs"
+  - Expressions: "f c f s", "select f c f s", "choose first come first serve"
 - **Intent**: `choosePriority`
-  - Expressions: "choose priority", "select priority", "priority"
+  - Expressions: "priority", "choose priority", "select priority"
 - **Intent**: `chooseRoundRobin`
-  - Expressions: "choose round robin", "select round robin", "round robin"
+  - Expressions: "round robin", "choose round robin", "select round robin"
 - **Intent**: `chooseSJF`
-  - Expressions: "choose shortest job first", "select sjf", "sjf"
+  - Expressions: "s j f", "choose s j f", "choose shortest job first"
+- **Intent**: `homeScheduler`
+  - Expressions: "go back to cake ville", "home"
+
+### Page Replacement Operations (Blueberry)
+- **Intent**: `startBlueberry`
+  - Expressions: "begin blueberry", "start blueberry"
+- **Intent**: `chooseFIFO`
+  - Expressions: "select FIFO", "select first in first out", "choose first in first out", "choose FIFO"
+- **Intent**: `chooseLRU`
+  - Expressions: "select l r u", "select least recently used", "choose least recently used", "choose l r u"
+- **Intent**: `chooseMRU`
+  - Expressions: "select most recently used", "choose most recently used", "select M R U", "choose M R U"
+- **Intent**: `chooseLFU`
+  - Expressions: "select least frequently used", "choose least frequently used", "select L F U", "choose L F U"
+- **Intent**: `chooseOPR`
+  - Expressions: "choose o p r", "select o p r", "select optimal page replacement", "choose optimal page replacement"
+- **Intent**: `backToAlgorithmSelection`
+  - Expressions: "back to algorithm selection"
+- **Intent**: `homeBlueberry`
+  - Expressions: "home to blueberry ville", "back to blueberry ville"
+
+### Frame Management
+- **Intent**: `setFrameCount1`
+  - Expressions: "set frame count to one"
+- **Intent**: `setFrameCount2`
+  - Expressions: "set frame count to two"
+- **Intent**: `setFrameCount3`
+  - Expressions: "set frame count to three"
+- **Intent**: `setFrameCount4`
+  - Expressions: "set frame count to four"
+- **Intent**: `setFrameCount5`
+  - Expressions: "set frame count to five"
+- **Intent**: `setFrameCount6`
+  - Expressions: "set frame count to six"
+- **Intent**: `setFrameCount7`
+  - Expressions: "set frame count to seven"
+- **Intent**: `increaseFrames`
+  - Expressions: "increase frames"
+- **Intent**: `decreaseFrames`
+  - Expressions: "decrease frames"
 
 ### Simulation Control
 - **Intent**: `playSimulation`
-  - Expressions: "play simulation", "start simulation", "run simulation"
+  - Expressions: "play", "run simulation", "start simulation", "play simulation"
 - **Intent**: `pauseSimulation`
-  - Expressions: "pause simulation", "pause"
+  - Expressions: "pause", "pause simulation"
 - **Intent**: `stopSimulation`
-  - Expressions: "stop simulation", "end simulation"
+  - Expressions: "stop", "end simulation", "stop simulation"
 - **Intent**: `addProcess`
-  - Expressions: "add process", "create process", "new process"
+  - Expressions: "new process", "create process", "add process"
 - **Intent**: `nextStep`
-  - Expressions: "next", "next step", "continue"
+  - Expressions: "continue", "next step", "next"
+
+### Algorithm Control
+- **Intent**: `simulateAlgorithm`
+  - Expressions: "simulate algorithm"
+- **Intent**: `pauseAlgorithm`
+  - Expressions: "pause algorithm", "pause page replacement"
+- **Intent**: `resumeAlgorithm`
+  - Expressions: "resume algorithm", "resume page replacement"
+- **Intent**: `resetAlgorithm`
+  - Expressions: "stop algorithm", "clear page replacement", "reset page replacement"
 
 6. Train the context (this may take a few minutes)
 7. Download the generated `.rhn` file
-8. Place the `.rhn` file in your Unity project's `Assets/StreamingAssets/` folder
-9. Rename it to `honeyos_context.rhn`
+8. Place the `.rhn` file in the appropriate platform folder under `Assets/StreamingAssets/contexts/` and rename it:
+   - **Windows**: Place in `Assets/StreamingAssets/contexts/windows/` and rename to `honeyos_context_windows.rhn`
+   - **Mac**: Place in `Assets/StreamingAssets/contexts/mac/` and rename to `honeyos_context_mac.rhn`
+   - **Linux**: Place in `Assets/StreamingAssets/contexts/linux/` and rename to `honeyos_context_linux.rhn`
+   - **Android**: Place in `Assets/StreamingAssets/contexts/android/` and rename to `honeyos_context_android.rhn`
+   - **iOS**: Place in `Assets/StreamingAssets/contexts/ios/` and rename to `honeyos_context_ios.rhn`
 
 ## Step 4: Configure Unity Project
 1. Open your Unity project
 2. Find the `MicrophoneDemo` script in the scene
 3. In the Inspector, set the following:
    - **Access Key**: Paste your Picovoice access key
-   - **Context Path**: `honeyos_context.rhn`
+   - **Context Path**: Use the appropriate platform-specific path:
+     - **Windows**: `honeyos_context_windows.rhn`
+     - **Mac**: `honeyos_context_mac.rhn`
+     - **Linux**: `honeyos_context_linux.rhn`
+     - **Android**: `honeyos_context_android.rhn`
+     - **iOS**: `honeyos_context_ios.rhn`
 
 ## Step 5: Remove Whisper Dependencies
 1. Remove or disable the old Whisper-related scripts and assets

@@ -29,22 +29,29 @@
 
 ### 1. Install Picovoice Unity SDK
 ```bash
-# Download from: https://github.com/Picovoice/rhino/releases
+# Download from: 
+https://github.com/Picovoice/rhino/tree/master/binding/unity
 # Import the .unitypackage file into your Unity project
 ```
 
 ### 2. Get Picovoice Access Key
 1. Sign up at [Picovoice Console](https://console.picovoice.ai/)
 2. Copy your Access Key
-3. Paste it into the `accessKey` field in `MicrophoneDemo` script
+3. Paste it into the `Access Key` field in your VoiceButton `MicrophoneDemo` script component found in Unity.
 
 ### 3. Create Rhino Context
 1. Go to Picovoice Console → Rhino Speech-to-Intent
 2. Create new context named "HoneyOS"
 3. Add all intents from `PICOVOICE_SETUP.md`
-4. Train the context
+4. Train the context and choose the correct OS platform of your device.
 5. Download the `.rhn` file
-6. Place it in `Assets/StreamingAssets/honeyos_context.rhn`
+6. Place it in the appropriate platform folder under `Assets/StreamingAssets/contexts/` and rename it:
+   - **Windows**: Place in `Assets/StreamingAssets/contexts/windows/` and rename to `honeyos_context_windows.rhn`
+   - **Mac**: Place in `Assets/StreamingAssets/contexts/mac/` and rename to `honeyos_context_mac.rhn`
+   - **Linux**: Place in `Assets/StreamingAssets/contexts/linux/` and rename to `honeyos_context_linux.rhn`
+   - **Android**: Place in `Assets/StreamingAssets/contexts/android/` and rename to `honeyos_context_android.rhn`
+   - **iOS**: Place in `Assets/StreamingAssets/contexts/ios/` and rename to `honeyos_context_ios.rhn`
+
 
 ### 4. Remove Whisper Dependencies
 - Remove Whisper Unity package
@@ -52,7 +59,7 @@
 - Clean up any remaining references
 
 ### 5. Update Unity Scene
-- Ensure `MicrophoneDemo` script is attached to a GameObject
+- Ensure `MicrophoneDemo` script is attached to the Voice Button GameObject
 - The `PicovoiceMicrophoneManager` will be added automatically
 - Configure the Inspector fields:
   - Set `accessKey` to your Picovoice key
@@ -100,7 +107,7 @@
 
 - [ ] Picovoice SDK imported successfully
 - [ ] Access key configured
-- [ ] Context file in StreamingAssets folder
+- [ ] Context file in contexts folder
 - [ ] All voice commands working
 - [ ] VAD indicator functioning
 - [ ] Spacebar input still works
