@@ -278,18 +278,12 @@ namespace HoneyOS.VoiceControl
             {
                 // App Management - using original command phrases as fallback
                 { "openSweet", ( () => desktopManager.OpenApp(0), "Opening Sweet") },
-                { "open sweet", ( () => desktopManager.OpenApp(0), "Opening Sweet") },
                 { "openSugar", ( () => desktopManager.OpenApp(3), "Opening Sugar") },
-                { "open sugar", ( () => desktopManager.OpenApp(3), "Opening Sugar") },
                 { "openBlueberry", ( () => desktopManager.OpenApp(2), "Opening Blueberry") },
                 { "openCake", ( () => desktopManager.OpenApp(1), "Opening Cake") },
-                { "open cake", ( () => desktopManager.OpenApp(1), "Opening Cake") },
                 { "closeApp", ( () => desktopManager.CloseCurrentApp(), "Closing app") },
-                { "close application", ( () => desktopManager.CloseCurrentApp(), "Closing app") },
                 { "closeAll", ( () => desktopManager.CloseAllApps(), "Closing all apps") },
-                { "close all", ( () => desktopManager.CloseAllApps(), "Closing all apps") },
                 { "minimizeApp", ( () => desktopManager.MinCurrentApp(), "Minimizing app") },
-                { "minimize application", ( () => desktopManager.MinCurrentApp(), "Minimizing app") },
                 
                 // File Operations - with error handling
                 { "saveFile", ( () => {
@@ -342,102 +336,52 @@ namespace HoneyOS.VoiceControl
                 
                 // Help Navigation
                 { "goBack", ( () => help.OpenHome(), "Going back to Home Page") },
-                { "go back", ( () => help.OpenHome(), "Going back to Home Page") },
                 { "openSystemBasics", ( () => help.OpenSystemBasics(), "Opening System Basics") },
-                { "open system basics", ( () => help.OpenSystemBasics(), "Opening System Basics") },
                 { "openAppGuide", ( () => help.OpenAppGuide(), "Opening Application Guide") },
-                { "open application guide", ( () => help.OpenAppGuide(), "Opening Application Guide") },
                 { "openAboutUs", ( () => help.OpenAboutUs(), "Opening About Us") },
-                { "open about us", ( () => help.OpenAboutUs(), "Opening About Us") },
                 
                 // Scheduler Operations
                 { "homeScheduler", ( () => scheduler.OpenHome(), "Going back to Cake Ville") },
                 { "startCake", ( () => scheduler.OpenSelectionPage(), "Opening Policy selector") },
-                { "start cake", ( () => scheduler.OpenSelectionPage(), "Opening Policy selector") },
                 { "backToPolicySelection", ( () => {scheduler.OpenSelectionPage(); processManager.Stop();}, "Opening Policy selector") },
-                { "back to policy selection", ( () => {scheduler.OpenSelectionPage(); processManager.Stop();}, "Opening Policy selector") },
                 { "chooseFCFS", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("FCFS");}, "FCFS Simulator") },
-                { "choose first come first serve", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("FCFS");}, "FCFS Simulator") },
                 { "choosePriority", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("Prio");}, "Priority Simulator") },
-                { "choose priority", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("Prio");}, "Priority Simulator") },
                 { "chooseRoundRobin", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("RR");}, "Round Robin Simulator") },
-                { "choose round robin", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("RR");}, "Round Robin Simulator") },
                 { "chooseSJF", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("SJF");}, "Shortest Job First Simulator") },
-                { "choose shortest job first", ( () => {scheduler.OpenSimPage(); processManager.SetSchedulingPolicy("SJF");}, "Shortest Job First Simulator") },
                 
                 // Simulation Control
                 { "playSimulation", ( () => processManager.Play(), "Starting simulation") },
-                { "play simulation", ( () => processManager.Play(), "Starting simulation") },
                 { "pauseSimulation", ( () => processManager.Pause(), "Pausing simulation") },
                 { "pause", ( () => processManager.Pause(), "Pausing simulation") },
                 { "stopSimulation", ( () => processManager.Stop(), "Stopping simulation") },
-                { "stop simulation", ( () => processManager.Stop(), "Stopping simulation") },
                 { "addProcess", ( () => processManager.AddProcess(false), "Adding Process") },
-                { "add process", ( () => processManager.AddProcess(false), "Adding Process") },
                 { "nextStep", ( () => processManager.Next(), "Next step") },
-                { "next", ( () => processManager.Next(), "Next step") },
 
                 //Page Algorithms
                 { "homeBlueberry", ( () => pageReplacementNav.OpenHome(), "Going back to Blueberry Ville") },
-                { "home blueberry", ( () => pageReplacementNav.OpenHome(), "Going back to Blueberry Ville") },
                 { "startBlueberry", ( () => pageReplacementNav.OpenSelectionPage(), "Opening Algorithm selector") },
-                { "start blueberry", ( () => pageReplacementNav.OpenSelectionPage(), "Opening Algorithm selector") },
                 { "backToAlgorithmSelection", ( () => {pageReplacementNav.OpenSelectionPage(); algorithmManager.Reset();}, "Opening Algorithm selector") },
-                { "back to algorithm selection", ( () => {pageReplacementNav.OpenSelectionPage(); algorithmManager.Reset();}, "Opening Algorithm selector") },
                 
                 // FIFO Algorithm
                 { "chooseFIFO", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
-                { "choose FIFO", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
-                { "choose fifo", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
-                { "select FIFO", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
-                { "select fifo", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
-                { "first in first out", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("FIFO");}, "Opening FIFO Page Replacement Simulator") },
                 
                 // OPR Algorithm
                 { "chooseOPR", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
-                { "choose OPR", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
-                { "choose opr", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
-                { "select OPR", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
-                { "select opr", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
-                { "choose optimal", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
-                { "optimal page replacement", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("OPR");}, "Opening Optimal Page Replacement Simulator") },
-                
+
                 // LRU Algorithm
                 { "chooseLRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
-                { "choose LRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
-                { "choose lru", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
-                { "select LRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
-                { "select lru", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
-                { "least recently used", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LRU");}, "Opening Least Recently Used Page Replacement Simulator") },
                 
                 // MRU Algorithm
                 { "chooseMRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
-                { "choose MRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
-                { "choose mru", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
-                { "select MRU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
-                { "select mru", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
-                { "most recently used", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("MRU");}, "Opening Most Recently Used Page Replacement Simulator") },
-                
+                                
                 // LFU Algorithm
                 { "chooseLFU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
-                { "choose LFU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
-                { "choose lfu", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
-                { "select LFU", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
-                { "select lfu", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
-                { "least frequently used", ( () => {pageReplacementNav.OpenSimPage(); algorithmManager.SetAlgorithm("LFU");}, "Opening Least Frequently Used Page Replacement Simulator") },
                 
                 // Algorithm Control
                 { "simulateAlgorithm", ( () => { algorithmManager.ProcessReferenceString();  algorithmManager.RunSelectedAlgorithm();}, "Starting simulation") },
-                { "simulate algorithm", ( () => { algorithmManager.ProcessReferenceString();  algorithmManager.RunSelectedAlgorithm();}, "Starting simulation") },
-                { "start algorithm", ( () => { algorithmManager.ProcessReferenceString();  algorithmManager.RunSelectedAlgorithm();}, "Starting simulation") },
-                { "run algorithm", ( () => { algorithmManager.ProcessReferenceString();  algorithmManager.RunSelectedAlgorithm();}, "Starting simulation") },
                 { "pauseAlgorithm", ( () => { algorithmManager.TogglePause();}, "Pausing simulation") },
-                { "pause algorithm", ( () => { algorithmManager.TogglePause();}, "Pausing simulation") },
                 { "resumeAlgorithm", ( () => { algorithmManager.TogglePause();}, "Resuming simulation") },
-                { "resume algorithm", ( () => { algorithmManager.TogglePause();}, "Resuming simulation") },
                 { "resetAlgorithm", ( () => { algorithmManager.Reset();}, "Stopping simulation") },
-                { "reset algorithm", ( () => { algorithmManager.Reset();}, "Stopping simulation") },
-                { "stop algorithm", ( () => { algorithmManager.Reset();}, "Stopping simulation") },
 
                 //Frame Count
                 { "increaseFrames", ( () => IncreaseFrameCount(), "DYNAMIC_MESSAGE") },
